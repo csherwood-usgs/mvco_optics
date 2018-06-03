@@ -51,7 +51,7 @@ ba =
     LISSTfields: {26×1 cell}
     
     ...and many more
-    ```
+```
 
 ### Processing scripts
 
@@ -62,4 +62,5 @@ ba =
   * Interpolates the results onto the u* time base, then onto two-hour time base
 
 * `fdyn.m` - various time series plots of floc parameters
+* `ws_fit.m` - Fits Rouse profiles to profile data (e.g., `suspsed_ba20_20rstrim_crs.mat`) using both linear and non-linear fitting routines
 
