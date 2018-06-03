@@ -2,10 +2,10 @@
 Routines, notes, and results for review paper on particle optics
 
 ### Data files
-`advpr_mvco11_05-Jan-2012.mat` - Processed ADV pair data, with velocities, wave parameters, and stresses
-`puv_proc_green_30-Dec-2011.mat` - Current, wave, and Madsen 94 mode results from green ADV
-`_pfa.mat` files are time series of profile fit parameters
-`suspsed_ba20_rstrim_crs.mat` - Profile data structure, with fields like this:
+* `advpr_mvco11_05-Jan-2012.mat` - Processed ADV pair data, with velocities, wave parameters, and stresses
+* `puv_proc_green_30-Dec-2011.mat` - Current, wave, and Madsen 94 mode results from green ADV
+* `_pfa.mat` files are time series of profile fit parameters
+* `suspsed_ba20_rstrim_crs.mat` - Profile data structure, with fields like this:
 ```
 ba = 
   struct with fields:
@@ -53,12 +53,13 @@ ba =
     ...and many more
     ```
 
+### Processing scripts
 
-`plot_pfa_ts.m` - prepares data for `fdyn.m`
-* Loads the time series data `ustar_av.mat` created by `plot_ustar.m`
-* Loads LISST size bins from `lisst_av`
-* Loads a bunch of `*_pfa.mat` files
-* Interpolates the results onto the u* time base, then onto two-hour time base
+* `plot_pfa_ts.m` - prepares data for `fdyn.m`
+  * Loads the time series data `ustar_av.mat` created by `plot_ustar.m`
+  * Loads LISST size bins from `lisst_av`
+  * Loads a bunch of `*_pfa.mat` files
+  * Interpolates the results onto the u* time base, then onto two-hour time base
 
-`fdyn.m` - various time series plots of floc parameters
+* `fdyn.m` - various time series plots of floc parameters
 
