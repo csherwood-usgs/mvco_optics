@@ -3,6 +3,8 @@ Routines, notes, and results for review paper on particle optics
 
 ### Data files
 `advpr_mvco11_05-Jan-2012.mat` - Processed ADV pair data, with velocities, wave parameters, and stresses
+`puv_proc_green_30-Dec-2011.mat` - Current, wave, and Madsen 94 mode results from green ADV
+`_pfa.mat` files are time series of profile fit parameters
 `suspsed_ba20_rstrim_crs.mat` - Profile data structure, with fields like this:
 ```
 ba = 
@@ -47,10 +49,10 @@ ba =
          LISSTz: [12×2442 double]
         LISSTbe: [0.0500 0.2500 0.4500 0.6500 0.8500 1.0500 1.2500 1.4500 1.6500 1.8500 2.0500 2.2500 2.4500]
     LISSTfields: {26×1 cell}
-    ```
     
+    ...and many more
+    ```
 
-`_pfa.mat` files are time series of profile fit parameters
 
 `plot_pfa_ts.m` - prepares data for `fdyn.m`
 * Loads the time series data `ustar_av.mat` created by `plot_ustar.m`
