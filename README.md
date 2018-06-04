@@ -2,10 +2,13 @@
 Routines, notes, and results for review paper on particle optics
 
 ### Data files
+
+This is a list of key, most recent datafiles from the profiler. These reside in the `data_proc` directory, and will be copied into this repo if they are needed for the processing scripts stored her.
+
 * `advpr_mvco11_05-Jan-2012.mat` - Processed ADV pair data, with velocities, wave parameters, and stresses
 * `puv_proc_green_30-Dec-2011.mat` - Current, wave, and Madsen 94 model results from green ADV
 * `_pfa.mat` files are time series of profile fit parameters (not saved in this repo)
-* `suspsed_ba20_20rstrim_crs_cen.mat` - Profile data structure, with fields like this:
+* `suspsed_ba20_20rstrim_crs_cen.mat` - Profile data structure for all instruments after bin averaging. This is the starting dataset for this repo, and has two structures (`ba` for bin-averaged, and `va` for variance) with fields like this:
 ```
 ba = 
   struct with fields:
@@ -61,9 +64,10 @@ ba =
 ```
 
 ### Processing scripts
-* `bin_ave_var_suspsed_insts.m` - Bin averages raw data (as posted in data release) to make profile .mat files (e.g., `suspsed_ba_20_rstrim_crs.mat'). The number (e.g., 20) indicates the minutes for bin-average...20 = 1 profile, 40 = 2 profiles, 80 = 3 profiles. The `_var_` here indicates that variance results are also produced.  _cen_ in the output file name means that bin centers are included.
 
-* `ws_fit_mo.m` - Fits Rouse profiles to profile data (e.g., `suspsed_ba20_20rstrim_crs_cen.mat`) using both linear and non-linear fitting routines. _mo suffix indicates this file has been derived from un-prefixed version in `data_proc` directory.
+Important processing scripts that have not been copied into this repo are:
+
+* `bin_ave_var_suspsed_insts.m` - Bin averages raw data (as posted in data release) to make profile .mat files (e.g., `suspsed_ba_20_20rstrim_crs_cen.mat`). The number (e.g., 20) indicates the minutes for bin-average...20 = 1 profile, 40 = 2 profiles, 80 = 3 profiles. The `var` here indicates that variance results are also produced. `cen` in the output file name means that bin centers are included for some (but not all) of the instruments. (Why not all? Might need to look back at this.)
 
 * `plot_pfa_ts.m` - prepares data for `fdyn.m`
   * Loads the time series data `ustar_av.mat` created by `plot_ustar.m`
@@ -72,5 +76,12 @@ ba =
   * Interpolates the results onto the u* time base, then onto two-hour time base
 
 * `fdyn.m` - various time series plots of floc parameters
+
+Scripts included in this repo are:
+
+* `ws_fit_mo.m` - Fits Rouse profiles to profile data (e.g., `suspsed_ba20_20rstrim_crs_cen.mat`) using both linear and non-linear fitting routines. The `mo` suffix indicates this file has been derived from un-prefixed version in `data_proc` directory.
+
+* `p_fit_times_mo.m` - Derivative of `ws_fit_mo.m` restructured to produce profiles of many instruments for one time period. This is still a work in progress. It calls fitting routines `pfit.m` and `pfit_nlp.m`, which require `lsfit.m`
+
 
 
