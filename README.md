@@ -1,5 +1,14 @@
 # mvco_optics
-Routines, notes, and results for review paper on particle optics
+Routines, notes, and results for review paper on particle optics.
+
+### Objective
+
+The immediate goal is to extract some example vertical profiles from the MVCO experimental data. In this case, the raw data consists of bin-averaged times, elevations, and instrument responses for instruments on the profiling arm. Ancillary data of time series of flow characteristics are in other data streams.
+
+Right now, I am working on a routine to extract and plot several profiles from specified times. The plan, once the profile plots are reasonably legible, is to look for good examples from times with different flow conditions and particle populations. So far, the results for a random time look like this:
+
+![alt text](profiles.png "profiles.png")
+
 
 ### Data files
 
