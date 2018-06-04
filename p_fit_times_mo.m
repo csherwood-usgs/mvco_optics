@@ -2,8 +2,14 @@
 % specific times
 ifnorm = 0; % divide all of the values by the global mean
 
-avinterval = '20'
+load ustar_av % made by plot_ustar.m
+burst_length = 3480/(3600*24);
+dus = [ustar_av.dn]+burst_length/2.;
+us = [ustar_av.us];
+ew = sign([ustar_av.u]);
+ewus = ew.*us;
 
+% 20-minute bin averages
 load suspsed_ba20_20rstrim_crs_cen
 % use bin centers when available
     inst = {...
@@ -27,13 +33,14 @@ load suspsed_ba20_20rstrim_crs_cen
 
 za = 0.1; % (m) Ca estimates standardized to this elevation
 nav = 0;  % number of profiles to left and right to be averaged
-%%
-ydt = 276.2; % list of target year days
+%
+ydt = 276.2:(1/3)/24:285; % list of target year days
 dnt = datenum(2011,1,1)+ydt-1
 datestr(dnt)
 
+for ii=1% 1:length(dnt)
 figure(1); clf
-% Cp650
+%% Cp650
 plotnum=0;
 for ino=[7]
     disp('UME Cp605')
@@ -51,18 +58,24 @@ for ino=[7]
 %     end
 
     % find target time
-    i = find(allt(6,:)>dnt,1,'first');
+    i = find(allt(6,:)>=dnt(ii),1,'first');
+    % get closest u* value
+    ustar = interp1(dus,us,t,'nearest')
     
     c = allc(:,i);
     varc = allvc(:,i);
     z = allz(:,i);
     t = nanmean(allt(:,i));
+    fprintf(1,'Target time: %s; mean profile time: %s\n',datestr(dnt(ii)),datestr(t));
+    % get closest u* value
+    ustar = interp1(dus,us,t,'nearest')
+
     tmin = nanmin(nanmin(allt(:,i)));
     tmax = nanmax(nanmax(allt(:,i)));
     ok = (~isnan(c+z));
     
     if(sum(ok)>3)
-        datestr(t)
+
 %         datestr(tmin)
 %         datestr(tmax)
         subplot(4,3,plotnum)
@@ -104,7 +117,7 @@ for ino=[5]
     end
 
     % find target time
-    i = find(allt(6,:)>dnt,1,'first');
+    i = find(allt(6,:)>dnt(ii),1,'first');
 
     c = allc(:,i);
     varc = allvc(:,i);
@@ -151,7 +164,7 @@ for ino=[3:4]
     end
 
     % find target time
-    i = find(allt(6,:)>dnt,1,'first');
+    i = find(allt(6,:)>dnt(ii),1,'first');
 
     c = allc(:,i);
     varc = allvc(:,i);
@@ -203,7 +216,7 @@ for ino=[1]
     end
     
     % find target time
-    i = find(allt(6,:)>dnt,1,'first');
+    i = find(allt(6,:)>dnt(ii),1,'first');
     
     c = allc(:,i);
     varc = allvc(:,i);
@@ -259,7 +272,7 @@ for ino=[13:15]
     end
     
     % find target time
-    i = find(allt(6,:)>dnt,1,'first');
+    i = find(allt(6,:)>dnt(ii),1,'first');
 
     c = allc(:,i);
     varc = allvc(:,i);
@@ -317,7 +330,7 @@ for ino=[16]
     end
     
     % find target time
-    i = find(allt(6,:)>dnt,1,'first');
+    i = find(allt(6,:)>dnt(ii),1,'first');
 
     c = allc(:,i);
     varc = allvc(:,i);
@@ -375,7 +388,7 @@ for ino=[8]
     end
    
     % find target time
-    i = find(allt(6,:)>dnt,1,'first');
+    i = find(allt(6,:)>dnt(ii),1,'first');
 
     c = allc(:,i);
     varc = allvc(:,i);
@@ -426,7 +439,7 @@ for ino=[1]
         allc = allc/(nanmean(allc(:)));
     end
     % find target time
-    i = find(allt(6,:)>dnt,1,'first');
+    i = find(allt(6,:)>dnt(ii),1,'first');
 
     c = allc(:,i);
     allv = sqrt(vv.(inst{1,3}).^2+vv.(inst{5,3}).^2);
@@ -468,4 +481,7 @@ for ino=[1]
     end
 end
 %%
-print -dpng profiles.png
+shg
+pfn = sprintf('./plots/p%d.png',ii)
+%print(pfn,'-dpng')
+end
