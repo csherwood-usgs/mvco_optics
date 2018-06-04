@@ -3,13 +3,19 @@ Routines, notes, and results for review paper on particle optics
 
 ### Data files
 * `advpr_mvco11_05-Jan-2012.mat` - Processed ADV pair data, with velocities, wave parameters, and stresses
-* `puv_proc_green_30-Dec-2011.mat` - Current, wave, and Madsen 94 mode results from green ADV
+* `puv_proc_green_30-Dec-2011.mat` - Current, wave, and Madsen 94 model results from green ADV
 * `_pfa.mat` files are time series of profile fit parameters (not saved in this repo)
-* `suspsed_ba20_rstrim_crs.mat` - Profile data structure, with fields like this:
+* `suspsed_ba20_20rstrim_crs_cen.mat` - Profile data structure, with fields like this:
 ```
 ba = 
   struct with fields:
 
+          ADVzc: [12×2441 double]
+          ADVtc: [12×2441 double]
+          OBSzc: [12×2441 double]
+          OBStc: [12×2441 double]
+        transzc: [12×2441 double]
+        transtc: [12×2441 double]
          ADVagc: [12×2441 double]
             OBS: [12×2441 double]
        tranattn: [12×2441 double]
@@ -21,7 +27,7 @@ ba =
            ADVz: [12×2441 double]
            OBSz: [12×2441 double]
           tranz: [12×2441 double]
-          ADVbe: [0.0500 0.2500 0.4500 0.6500 0.8500 1.0500 1.2500 1.4500 1.6500 1.8500 2.0500 2.2500 2.4500]
+          ADVbe: [1×13 double]
       ADVfields: {13×1 cell}
       LISSTattn: [12×2442 double]
       LISSTD16v: [12×2442 double]
@@ -47,9 +53,10 @@ ba =
         LISSTsz: [32×1 double]
         LISSTdn: [12×2442 double]
          LISSTz: [12×2442 double]
-        LISSTbe: [0.0500 0.2500 0.4500 0.6500 0.8500 1.0500 1.2500 1.4500 1.6500 1.8500 2.0500 2.2500 2.4500]
-    LISSTfields: {26×1 cell}
-    
+        LISSTzc: [12×2442 double]
+        LISSTtc: [12×2442 double]
+        LISSTbe: [1×13 double]
+    LISSTfields: {28×1 cell}
     ...and many more
 ```
 
