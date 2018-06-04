@@ -28,7 +28,7 @@ load suspsed_ba20_20rstrim_crs_cen
 za = 0.1; % (m) Ca estimates standardized to this elevation
 nav = 0;  % number of profiles to left and right to be averaged
 %%
-ydt = 276.09; % list of target year days
+ydt = 276.2; % list of target year days
 dnt = datenum(2011,1,1)+ydt-1
 datestr(dnt)
 
@@ -134,7 +134,7 @@ for ino=[5]
         xlabel('Attenuation ( m^{-1} )');
         title(inst{ino,4});
         ts = sprintf('%s\nN=%d\nCa=%7.2f\np=% 5.2f\nr^2=%06.4f\nCa_n=%7.2f\np_n=% 5.2f\nr_n^2=%06.4f',...
-            datestr(t,'dd-mmm-yyyy HHMM'),pf.N,pf.Ca,-pf.p,pf.r2,pfnl.Ca,-pfnl.p,pfnl.r2);
+            datestr(t,'dd-mmm-yyyy HHMM'),pf.N,pf.Ca,-pf.p,pf.r2,pfnl.Ca,-pfnl.p,pfnl.r2)
         text(.015,.3,ts);
     end
 end
@@ -159,12 +159,12 @@ for ino=[3:4]
     t = nanmean(allt(:,i))
     tmin = nanmin(nanmin(allt(:,i)));
     tmax = nanmax(nanmax(allt(:,i)));
-    ok = (~isnan(c+z))
+    ok = (~isnan(c+z));
     
     if(sum(ok)>3)
         datestr(t)
-        datestr(tmin)
-        datestr(tmax)
+%         datestr(tmin)
+%         datestr(tmax)
         subplot(4,3,plotnum)
         pf = pfit( c(ok), z(ok),0, za);
         loglog(c(ok)./pf.Ca,z(ok),'ok')
@@ -184,14 +184,15 @@ for ino=[3:4]
         title(inst{ino,4});
         ts = sprintf('%s\nN=%d\nCa=%7.2f\np=% 5.2f\nr^2=%06.4f\nCa_n=%7.2f\np_n=% 5.2f\nr_n^2=%06.4f',...
             datestr(t,'dd-mmm-yyyy HHMM'),pf.N,pf.Ca,-pf.p,pf.r2,pfnl.Ca,-pfnl.p,pfnl.r2)
-        ht=text(.015,.3,ts)
-        set(ht,'fontsize',9)
+        ht=text(.015,.3,ts);
+        set(ht,'fontsize',9);
     end
 end
 
 %% LISST Vol. conc total
 plotnum=5;
 for ino=[1]
+    disp('LISST volume concentration')
     plotnum = plotnum+1;
     allt=ba.(inst{ino,1});
     allz=ba.(inst{ino,2});
@@ -205,20 +206,20 @@ for ino=[1]
     i = find(allt(6,:)>dnt,1,'first');
     
     c = allc(:,i);
-    c(c<1e-8)=NaN;
     varc = allvc(:,i);
     z = allz(:,i);
     disp([z,c,varc])
+    c(c<1e-8)=NaN;
     
-    t = nanmean(allt(:,i))
+    t = nanmean(allt(:,i));
     tmin = nanmin(nanmin(allt(:,i)));
     tmax = nanmax(nanmax(allt(:,i)));
-    ok = (~isnan(c+z))
+    ok = (~isnan(c+z));
     
     if(sum(ok)>3)
         datestr(t)
-        datestr(tmin)
-        datestr(tmax)
+%         datestr(tmin)
+%         datestr(tmax)
         subplot(4,3,plotnum)
         pf = pfit( c(ok), z(ok),0, za);
         loglog(c(ok)./pf.Ca,z(ok),'ok')
@@ -239,15 +240,16 @@ for ino=[1]
         title(inst{ino,4});
         ts = sprintf('%s\nN=%d\nCa=%7.2f\np=% 5.2f\nr^2=%06.4f\nCa_n=%7.2f\np_n=% 5.2f\nr_n^2=%06.4f',...
             datestr(t,'dd-mmm-yyyy HHMM'),pf.N,pf.Ca,-pf.p,pf.r2,pfnl.Ca,-pfnl.p,pfnl.r2)
-        ht = text(.015,.3,ts)
-        set(ht,'fontsize',9)
+        ht = text(.015,.3,ts);
+        set(ht,'fontsize',9);
     end
 end
 
 %% ABSS profiles
 plotnum=6;
 for ino=[13:15]
-    plotnum = plotnum+1
+    disp('ABSS')
+    plotnum = plotnum+1;
     allt=ba.(inst{ino,1});
     allz=ba.(inst{ino,2});
     allc=ba.(inst{ino,3});
@@ -262,15 +264,15 @@ for ino=[13:15]
     c = allc(:,i);
     varc = allvc(:,i);
     z = allz(:,i);
-    t = nanmean(allt(:,i))
+    t = nanmean(allt(:,i));
     tmin = nanmin(nanmin(allt(:,i)));
     tmax = nanmax(nanmax(allt(:,i)));
-    ok = (~isnan(c+z))
+    ok = (~isnan(c+z));
     
     if(sum(ok)>3)
         datestr(t)
-        datestr(tmin)
-        datestr(tmax)
+%         datestr(tmin)
+%         datestr(tmax)
         subplot(4,3,plotnum)
         pf = pfit( c(ok), z(ok),0, za);
         loglog(c(ok)./pf.Ca,z(ok),'ok')
@@ -292,15 +294,13 @@ for ino=[13:15]
         ts = sprintf('%s\nN=%d\nCa=%7.2f\np=% 5.2f\nr^2=%06.4f\nCa_n=%7.2f\np_n=% 5.2f\nr_n^2=%06.4f',...
             datestr(t,'dd-mmm-yyyy HHMM'),pf.N,pf.Ca,-pf.p,pf.r2,pfnl.Ca,-pfnl.p,pfnl.r2)
         ht=text(.015,.3,ts);
-        set(ht,'fontsize',9)
+        set(ht,'fontsize',9);
     end
 end
-
-
-
 %% UME gamma
 plotnum=9;
 for ino=[16]
+    disp('UME gamma')
     plotnum=plotnum+1;
     allt=ba.(inst{ino,1});
     allz=ba.(inst{ino,2});
@@ -311,12 +311,10 @@ for ino=[16]
     end
     
     if(ino==8 || ino==16) % no variance for Chl or gamma
-        allvc=ones(size(allc))
+        allvc=ones(size(allc));
     else
         allvc=vv.(inst{ino,3});
     end
-    dz = diff(allz(1:2,1));
-    [ nz nt ]= size( allz )
     
     % find target time
     i = find(allt(6,:)>dnt,1,'first');
@@ -324,15 +322,15 @@ for ino=[16]
     c = allc(:,i);
     varc = allvc(:,i);
     z = allz(:,i);
-    t = nanmean(allt(:,i))
+    t = nanmean(allt(:,i));
     tmin = nanmin(nanmin(allt(:,i)));
     tmax = nanmax(nanmax(allt(:,i)));
-    ok = (~isnan(c+z))
+    ok = (~isnan(c+z));
     
     if(sum(ok)>3)
         datestr(t)
-        datestr(tmin)
-        datestr(tmax)
+%         datestr(tmin)
+%         datestr(tmax)
         subplot(4,3,plotnum)
         pf = pfit( c(ok), z(ok),0, za);
         loglog(c(ok)./pf.Ca,z(ok),'ok')
@@ -347,20 +345,21 @@ for ino=[16]
         
         %xlim( [.5 500] )
         ylim( [.1 2.5] )
-        xlim( [.01, 1.2])
+        xlim( [.01, 5])
         ylabel('Elevation (mab)')
-        xlabel('Attenuation ( m^{-1} )');
+        xlabel('Gamma value');
         title(inst{ino,4});
         ts = sprintf('%s\nN=%d\nCa=%7.2f\np=% 5.2f\nr^2=%06.4f\nCa_n=%7.2f\np_n=% 5.2f\nr_n^2=%06.4f',...
             datestr(t,'dd-mmm-yyyy HHMM'),pf.N,pf.Ca,-pf.p,pf.r2,pfnl.Ca,-pfnl.p,pfnl.r2)
         ht = text(.015,.3,ts);
-        set(ht,'fontsize',9)
+        set(ht,'fontsize',9);
     end
 end
 
 %% UME chlorophyll
 plotnum=10;
 for ino=[8]
+    disp('UME chlorophyll')
     plotnum=plotnum+1;
     allt=ba.(inst{ino,1});
     allz=ba.(inst{ino,2});
@@ -370,7 +369,7 @@ for ino=[8]
         allc = allc/(nanmean(allc(:)));
     end
     if(ino==8 || ino==16) % no variance for Chl or gamma
-        allvc=ones(size(allc))
+        allvc=ones(size(allc));
     else
         allvc=vv.(inst{ino,3});
     end
@@ -381,15 +380,15 @@ for ino=[8]
     c = allc(:,i);
     varc = allvc(:,i);
     z = allz(:,i);
-    t = nanmean(allt(:,i))
+    t = nanmean(allt(:,i));
     tmin = nanmin(nanmin(allt(:,i)));
     tmax = nanmax(nanmax(allt(:,i)));
     ok = (~isnan(c+z));
     
     if(sum(ok)>3)
         datestr(t)
-        datestr(tmin)
-        datestr(tmax)
+%         datestr(tmin)
+%         datestr(tmax)
         subplot(4,3,plotnum)
         pf = pfit( c(ok), z(ok),0, za);
         loglog(c(ok)./pf.Ca,z(ok),'ok')
@@ -404,19 +403,20 @@ for ino=[8]
         
         %xlim( [.5 500] )
         ylim( [.1 2.5] )
-        xlim( [.01, 1.5])
+        xlim( [.01, 5])
         ylabel('Elevation (mab)')
-        xlabel('Attenuation ( m^{-1} )');
+        xlabel('Chlorophyll value');
         title(inst{ino,4});
         ts = sprintf('%s\nN=%d\nCa=%7.2f\np=% 5.2f\nr^2=%06.4f\nCa_n=%7.2f\np_n=% 5.2f\nr_n^2=%06.4f',...
             datestr(t,'dd-mmm-yyyy HHMM'),pf.N,pf.Ca,-pf.p,pf.r2,pfnl.Ca,-pfnl.p,pfnl.r2)
         ht=text(.015,.3,ts);
-        set(ht,'fontsize',9)
+        set(ht,'fontsize',9);
     end
 end
 %% LISST density - special case
 plotnum=11;
 for ino=[1]
+    disp('LISST density')
     plotnum = plotnum+1;
     allt=ba.(inst{ino,1});
     allz=ba.(inst{ino,2});
@@ -429,17 +429,20 @@ for ino=[1]
     i = find(allt(6,:)>dnt,1,'first');
 
     c = allc(:,i);
-    varc = allvc(:,i);
+    allv = sqrt(vv.(inst{1,3}).^2+vv.(inst{5,3}).^2);
+    varc = allv(:,i);
+
     z = allz(:,i);
     t = nanmean(allt(:,i));
     tmin = nanmin(nanmin(allt(:,i)));
     tmax = nanmax(nanmax(allt(:,i)));
-    ok = (~isnan(c+z))
+    ok = (~isnan(c+z));
+    disp([z c varc])
     
     if(sum(ok)>3)
         datestr(t)
-        datestr(tmin)
-        datestr(tmax)
+%         datestr(tmin)
+%         datestr(tmax)
         subplot(4,3,plotnum)
         pf = pfit( c(ok), z(ok),0, za);
         loglog(c(ok)./pf.Ca,z(ok),'ok')
@@ -454,13 +457,13 @@ for ino=[1]
         
         %xlim( [.5 500] )
         ylim( [.1 2.5] )
-        %xlim( [.01, 1.5])
+        xlim( [.1, 5])
         ylabel('Elevation (mab)')
         xlabel('LISST Density Proxy');
         title('LISST Attenuation / Volume Conc.');
         ts = sprintf('%s\nN=%d\nCa=%7.2f\np=% 5.2f\nr^2=%06.4f\nCa_n=%7.2f\np_n=% 5.2f\nr_n^2=%06.4f',...
             datestr(t,'dd-mmm-yyyy HHMM'),pf.N,pf.Ca,-pf.p,pf.r2,pfnl.Ca,-pfnl.p,pfnl.r2)
-        hs=text(.015,.3,ts);
+        hs=text(.15,.3,ts);
         set(hs,'fontsize',9);
     end
 end
