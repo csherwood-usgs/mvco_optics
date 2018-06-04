@@ -11,7 +11,7 @@ This is a list of key, most recent datafiles from the profiler. These reside in 
 * `suspsed_ba20_20rstrim_crs_cen.mat` - Profile data structure for all instruments after bin averaging. This is the starting dataset for this repo, and has two structures (`ba` for bin-averaged, and `va` for variance) with fields like this:
 ```
 ba = 
-  struct with fields:
+  struct with fields of arrays with dimensions [vertical bins x time]:
 
           ADVzc: [12×2441 double]
           ADVtc: [12×2441 double]
@@ -60,6 +60,7 @@ ba =
         LISSTtc: [12×2442 double]
         LISSTbe: [1×13 double]
     LISSTfields: {28×1 cell}
+    
     ...and many more
 ```
 
