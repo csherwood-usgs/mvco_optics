@@ -30,12 +30,12 @@ nav = 0;  % number of profiles to left and right to be averaged
 %%
 ino = 2;
 
-ydt = 276.5; % list of target year days
+ydt = 276.; % list of target year days
 dnt = datenum(2011,1,1)+ydt-1
 datestr(dnt)
 
 figure(1); clf
-% Cp
+% Cp650
 plotnum=0;
 for ino=[7]
     plotnum = plotnum+1
@@ -111,7 +111,7 @@ for ino=[7]
     end
 end
 
-% LISST Vol. conc 
+% LISST Vol. conc - micro and macro flocs
 plotnum=3;
 for ino=[3:4]
     plotnum = plotnum+1;
@@ -188,6 +188,7 @@ for ino=[3:4]
 end
 
 % LISST Vol. conc total
+if(0)
 plotnum=5;
 for ino=[1]
     plotnum = plotnum+1;
@@ -206,7 +207,6 @@ for ino=[1]
         % allc = (allc*2.7-1.3); %g/m3
         allc = (allc*2.7); %g/m3
     end
-    
     if(ino==8) % no variance for Chl (why not?)
         allvc=ones(size(allc))
     else
@@ -262,7 +262,7 @@ for ino=[1]
         ic = ic+1;
     end
 end
-
+end
 % ABSS profiles
 plotnum=6;
 for ino=[13:15]
