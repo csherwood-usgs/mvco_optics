@@ -9,6 +9,7 @@ Right now, I am working on a routine to extract and plot several profiles from s
 
 ![alt text](profiles.png "profiles.png")
 
+There is no top-middle plot. I could put turbidity there if useful. There is supposed to be LISST Volume Concentration plot in the second row, but it got skipped to to bad values. I need to chase that down. All values are raw numbers...they could be converted to something else.
 
 ### Data files
 
