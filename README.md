@@ -7,9 +7,7 @@ The immediate goal is to extract some example vertical profiles from the MVCO ex
 
 Right now, I am working on a routine to extract and plot several profiles from specified times. The plan, once the profile plots are reasonably legible, is to look for good examples from times with different flow conditions and particle populations. So far, the results for a random time look like this:
 
-![alt text](profiles.png "profiles.png")
-
-There is no top-middle plot. I could put turbidity there if useful. There is supposed to be LISST Volume Concentration plot in the second row, but it got skipped to to bad values. I need to chase that down. All values are raw numbers...they could be converted to something else.
+![alt text](oasis_time_series.png "OASIS time series")
 
 ### Data files
 
@@ -78,7 +76,7 @@ ba =
 
 Important processing scripts that have not been copied into this repo are:
 
-* `bin_ave_var_suspsed_insts.m` - Bin averages raw data (as posted in data release) to make profile .mat files (e.g., `suspsed_ba_20_20rstrim_crs_cen.mat`). The number (e.g., 20) indicates the minutes for bin-average...20 = 1 profile, 40 = 2 profiles, 80 = 3 profiles. The `var` here indicates that variance results are also produced. `cen` in the output file name means that bin centers are included for some (but not all) of the instruments. (Why not all? Might need to look back at this.)
+* `bin_ave_var_suspsed_insts.m` - Bin averages raw data (as posted in data release) to make profile .mat files (e.g., `suspsed_ba_20_20rstrim_crs_cen.mat`). The number (e.g., 20) indicates the minutes for bin-average...20 = 1 profile, 40 = 2 profiles, 80 = 3 profiles. The `var` here indicates that variance results are also produced. `cen` in the output file name means that bin centers are included for some (but not all) of the instruments. (Why not all? Might need to look back at this aspect.) The product of this script does not include any of the finest LISST sizes...the first 13 bins are all zeros, as is the input data...so it is not a problem with the script, and may be a result of the LISST data processing choices.
 
 * `plot_pfa_ts.m` - prepares data for `fdyn.m`
   * Loads the time series data `ustar_av.mat` created by `plot_ustar.m`
@@ -90,9 +88,20 @@ Important processing scripts that have not been copied into this repo are:
 
 Scripts included in this repo are:
 
-* `ws_fit_mo.m` - Fits Rouse profiles to profile data (e.g., `suspsed_ba20_20rstrim_crs_cen.mat`) using both linear and non-linear fitting routines. The `mo` suffix indicates this file has been derived from un-prefixed version in `data_proc` directory.
+* `ws_fit_mo.m` - Fits Rouse profiles to profile data (e.g., `suspsed_ba20_20rstrim_crs_cen.mat`) using both linear and non-linear fitting routines. The `mo` suffix indicates this file has been derived from un-prefixed version in `data_proc` directory. This was a preliminary start on plotting, and can probably be removed from the repo.
 
-* `p_fit_times_mo.m` - Derivative of `ws_fit_mo.m` restructured to produce profiles of many instruments for one time period. This is still a work in progress. It calls fitting routines `pfit.m` and `pfit_nlp.m`, which require `lsfit.m`
+* `p_fit_times_mo.m` - Derivative of `ws_fit_mo.m` restructured to produce profiles of many instruments for one time period. This is still a work in progress. It calls fitting routines `pfit.m` and `pfit_nlp.m`, which require `lsfit.m`, and the plots are made with a `plot_snippet.m'. At the top of this script, some days
+
+## Preliminary Results
+
+This is an overview time series of the OASIS measurements at the USGS profiling tripod.
+
+![alt text](oasis_time_series.png "OASIS time series")
+
+We have identified several periods with distinctive conditions. A "typical" profile plot for each one appears below.
+
+![alt text](oasis_time_series.png "OASIS time series")
+
 
 
 
