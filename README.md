@@ -5,10 +5,6 @@ Routines, notes, and results for review paper on particle optics.
 
 The immediate goal is to extract some example vertical profiles from the MVCO experimental data. In this case, the raw data consists of bin-averaged times, elevations, and instrument responses for instruments on the profiling arm. Ancillary data of time series of flow characteristics are in other data streams.
 
-Right now, I am working on a routine to extract and plot several profiles from specified times. The plan, once the profile plots are reasonably legible, is to look for good examples from times with different flow conditions and particle populations. So far, the results for a random time look like this:
-
-![alt text](oasis_time_series.png "OASIS time series")
-
 ### Data files
 
 This is a list of key, most recent datafiles from the profiler. These reside in the `data_proc` directory, and will be copied into this repo if they are needed for the processing scripts stored her.
@@ -100,7 +96,14 @@ This is an overview time series of the OASIS measurements at the USGS profiling 
 
 We have identified several periods with distinctive conditions. A "typical" profile plot for each one appears below.
 
-![alt text](oasis_time_series.png "OASIS time series")
+![alt text](maria_profiles.png "Maria")
+
+![alt text](spgtide_profiles.png "Spring tides")
+![alt text](ophelia_profiles.png "Ophelia")
+![alt text](calm_profiles.png "Calm")
+![alt text](noreaster_profiles.png "Noreaster")
+
+
 
 
 
