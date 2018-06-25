@@ -1,0 +1,297 @@
+close all
+clear all
+% p_fit_mo_times - Fit settling velocities for several quantities at
+% specific times
+ifnorm = 0; % divide all of the values by the global mean
+Ca_norm = 0; % normalize profiles by Ca
+lglg = 0; % make log-log plots
+load ustar_av % made by plot_ustar.m
+burst_length = 3480/(3600*24);
+dus = [ustar_av.dn]+burst_length/2.;
+speed = sqrt(ustar_av.u.^2+ustar_av.v.^2);
+us = [ustar_av.us];
+ew = sign([ustar_av.u]);
+ewus = ew.*us;
+ewspeed = ew.*speed;
+
+% 20-minute bin averages
+load suspsed_ba20_20rstrim_crs_cen
+% use bin centers when available
+inst = {...
+   'LISSTtc','LISSTzc','LISSTvtot','LISST Tot. Vol.';...
+   'LISSTtc','LISSTzc','LISSTfinesv','LISST Fines';...
+   'LISSTtc','LISSTzc','LISSTmicrov','LISST Micro. Vol.';...
+   'LISSTtc','LISSTzc','LISSTmacrov','LISST Macro. Vol.';...
+   'LISSTtc','LISSTzc','LISSTattn','LISST Attenuation';...
+   'YSIdn','YSIz','YSIturb','YSI Turbidity';... % no bin centers?
+   'UMEtc','UMEzc','UMEattn650','c_{p}_{650}';...
+   'UMEtc','UMEzc','UMEchl','Chl';...
+   'UMEtc','UMEzc','UMEbs650','bs_{650}';...
+   'trandn','tranz','tranattn','Trans. Attn.';...
+   'ADVdn','OBSz','OBS','OBS Backscatter';...
+   'ADVdn','ADVz','ADVagc','ADV AGC';...
+   'absstc','absszc','abss1','1 MHz ABSS';...
+   'absstc','absszc','abss2','2.5 MHz ABSS';...
+   'absstc','absszc','abss3','4 MHz ABSS';...
+   'UMEtc','UMEzc','UMEgamma','gamma';...
+   };
+
+za = 0.1; % (m) Ca estimates standardized to this elevation
+nav = 0;  % number of profiles to left and right to be averaged
+%list of target year days
+% ydt = [261:(1/3)/24:263];
+% plotdir = 'maria'
+% 
+ ydt = [261:(1/3)/24:288];
+% plotdir = 'spgtides'
+
+% ydt = [274:(1/3)/24:276];
+% plotdir = 'ophelia'
+% 
+ %ydt = [280:(1/3)/24:282];
+ plotdir = 'new'
+% 
+% ydt = [286:(1/3)/24:288];
+% plotdir = 'noreaster'
+
+yday_off = datenum('1-Jan-2011 00:00:00');
+dnt = yday_off+ydt;
+datestr(dnt);
+%%
+ii=1
+N=3;
+for ii=1:length(dnt)/N
+   
+   figure(1); clf
+   %% info box
+   %subplot(4,3,3)
+   xlim([0 1])
+   ylim([0 1])
+   speed = interp1(dus,ewspeed,dnt(1+(ii-1)*N:ii*N),'nearest'); speed=nanmean(speed);
+   ustar = interp1(dus,us,dnt(1+(ii-1)*N:ii*N),'nearest'); ustar=nanmean(ustar);
+   ubr = interp1(dus,ustar_av.ubr,dnt(1+(ii-1)*N:ii*N),'nearest'); ubr=nanmean(ubr);
+   zo = interp1(dus,ustar_av.zoa,dnt(1+(ii-1)*N:ii*N),'nearest'); zo=nanmean(zo);
+   J=floor(nanmedian(1+(ii-1)*N:ii*N));
+   text(0.1,.9,datestr(dnt(J)))
+   ydayc = dnt(J)-datenum('1-Jan-2011 00:00:00');
+   text(0.1,.8,sprintf('Day: %6.2f',ydayc))
+   text(0.1,.7,sprintf('Speed: %5.2f m/s',speed))
+   text(0.1,.6,sprintf('ubr: % 4.3f m/s',ubr))
+   text(0.1,.5,sprintf('u*c: % 4.3f m/s',ustar))
+   text(0.1,.4,sprintf('zo : % 6.4f m',zo))
+   set(gca,'Visible','off') 
+   
+   figure(2); clf
+   %% Cp650
+   plotnum=1;
+   ino=[7]
+   disp('UME Cp650')
+   allt=ba.(inst{ino,1});
+   allz=ba.(inst{ino,2});
+   allc=ba.(inst{ino,3});
+   alld=ba.UMEbs650;
+   allvc=vv.(inst{ino,3});
+   allvd=vv.UMEbs650;
+%    if(ifnorm)
+%       allc = allc/(nanmean(allc(:)));
+%    end
+   
+   % find target time
+   i = find(allt(6,:)>=dnt(1+(ii-1)*N) & allt(6,:)<dnt(ii*N));
+   
+   c = nanmean(allc(:,i)')';
+   d = nanmean(alld(:,i)')'*40;
+   varc = allvc(:,i);
+   vard = allvd(:,i)*40;
+   var = allvc(:,i);
+   z = allz(:,floor(mean(i)));
+   t = nanmean(allt(:,floor(mean(i))));
+   fprintf(1,'Target time: %s; mean profile time: %s\n',datestr(dnt(ii)),datestr(t));
+   %ustar = interp1(dus,us,t,'nearest')
+   
+   ok = (~isnan(c+z));
+   
+   if(sum(ok)>3)
+      subplot(2,3,1)
+      plot_snippet_new
+      xlabel('c_p(650) and 40xb_{bp}(650) m^{-1} )');
+      ttext1 = sprintf('ws_cp= %4.2f  ws_bbp=%4.2f',-1000*0.41*pfnl.p*ustar,-1000*0.41*pfnl2.p*ustar)
+      title(ttext1);
+      %xlabel('Attenuation ( m^{-1} )');
+%      ttext = sprintf('%s w_s: %4.2f r^2: %4.2f',inst{ino,4},-1000*0.41*pfnl2.p*ustar,pfnl2.r2)
+      hold off
+   end
+   
+   %% UME gamma
+   plotnum=2;
+   ino=[16]
+      disp('UME gamma')
+      allt=ba.(inst{ino,1});
+      allz=ba.(inst{ino,2});
+      allc=ba.(inst{ino,3});
+      alld=ba.UMEbs532;
+      alle=ba.UMEbs650;
+      
+      % find target time
+     i = find(allt(6,:)>=dnt(1+(ii-1)*N) & allt(6,:)<dnt(ii*N));     
+   c = nanmean(allc(:,i)')';
+   d = nanmean(alld(:,i)')';
+   e = nanmean(alle(:,i)')';
+   gamma_bb=(650/532)*log(d./e);
+   z = allz(:,floor(mean(i)));
+   t = nanmean(allt(:,floor(mean(i))));
+      tmin = nanmin(nanmin(allt(:,i)));
+      tmax = nanmax(nanmax(allt(:,i)));
+      ok = (~isnan(c+z));
+      
+      if(sum(ok)>3)
+         datestr(t)
+         subplot(2,3,2)
+         %plot_snippet
+         hp=plot(c(ok),z(ok),'ok');
+         set(hp,'markerfacecolor',[0 0 1],'markeredgecolor',[0,0,1])
+         hold on
+         hp2=plot(gamma_bb(ok)+0.2,z(ok),'ok');
+         set(hp2,'markerfacecolor',[1 0 0],'markeredgecolor',[1,0,0])
+         xlabel('\gamma_{cp}(R), \gamma_{bbp}(K)+0.3');
+         ylabel('Elevation [m]')
+         hold off
+         ylim([0.1 2])
+         %ttext = sprintf('%s w_s: %4.2f r^2: %4.2f',inst{ino,4},-1000*0.41*pfnl.p*ustar,pfnl.r2);
+         %title(ttext)
+      end
+   
+   
+   %% LISST D50
+   plotnum=3;
+   ino=[1]
+   disp('LISST D50')
+   allt=ba.(inst{ino,1});
+   allz=ba.(inst{ino,2});
+   allc=ba.LISSTD50a;
+   
+%    if(ifnorm)
+%       allc = allc/(nanmean(allc(:)));
+%    end
+   
+   % find target time
+   i = find(allt(6,:)>=dnt(1+(ii-1)*N) & allt(6,:)<dnt(ii*N));     
+   c = nanmean(allc(:,i)')';
+   z = allz(:,floor(mean(i)));
+   t = nanmean(allt(:,floor(mean(i))));
+   ok = (~isnan(c+z));
+   
+   if(sum(ok)>3)
+      datestr(t)
+      %         datestr(tmin)
+      %         datestr(tmax)
+      subplot(2,3,3)
+      %plot_snippet
+       hp=plot(c(ok),z(ok),'ok');
+      ylabel('Elevation [m]')
+      xlabel('Lisst D_{50} [\mum]');
+%       ttext = sprintf('%s w_s: %4.2f r^2: %4.2f',inst{ino,4},-1000*0.41*pfnl.p*ustar,pfnl.r2);
+%       title(ttext)
+   end
+    ylim([0.1 2])
+   
+  %% Backscattering ratio
+   plotnum=4;
+   for ino=[8]
+      disp('UME bbr')
+      plotnum=plotnum+1;
+      allt=ba.(inst{ino,1});
+      allz=ba.(inst{ino,2});
+      allc=(ba.UMEbs650./ba.UMEattn650);
+      
+%       if(ino==8 || ino==16) % no variance for Chl or gamma
+%          allvc=ones(size(allc));
+%       else
+%          allvc=vv.(inst{ino,3});
+%       end
+      
+      % find target time
+   i = find(allt(6,:)>=dnt(1+(ii-1)*N) & allt(6,:)<dnt(ii*N));     
+   c = nanmean(allc(:,i)')';
+   z = allz(:,floor(mean(i)));
+   t = nanmean(allt(:,floor(mean(i))));
+      ok = (~isnan(c+z));
+      
+      if(sum(ok)>3)
+         datestr(t)
+         subplot(2,3,4)
+         hp=plot(c(ok),z(ok),'ok');
+         ylabel('Elevation [m]')
+         xlabel('b_{bp}/b_p(650)');
+         %ttext = sprintf('%s w_s: %4.2f r^2: %4.2f',inst{ino,4},-1000*0.41*pfnl.p*ustar,pfnl.r2);
+         %title(ttext)
+         ylim([0.1 2])
+      end
+   end
+   %% UME chlorophyll over attenuation
+   plotnum=5;
+   for ino=[8]
+      disp('UME chlorophyll over attenuation')
+      plotnum=plotnum+1;
+      allt=ba.(inst{ino,1});
+      allz=ba.(inst{ino,2});
+      allc=(ba.(inst{ino,3})./(ba.(inst{7,3})));
+      
+%       if(ino==8 || ino==16) % no variance for Chl or gamma
+%          allvc=ones(size(allc));
+%       else
+%          allvc=vv.(inst{ino,3});
+%       end
+      
+      % find target time
+   i = find(allt(6,:)>=dnt(1+(ii-1)*N) & allt(6,:)<dnt(ii*N));     
+   c = nanmean(allc(:,i)')';
+   z = allz(:,floor(mean(i)));
+   t = nanmean(allt(:,floor(mean(i))));
+      ok = (~isnan(c+z));
+      
+      if(sum(ok)>3)
+         datestr(t)
+         subplot(2,3,5)
+         hp=plot(c(ok),z(ok),'ok');
+         ylabel('Elevation [m]')
+         xlabel('Chl/c_p(650)');
+         %ttext = sprintf('%s w_s: %4.2f r^2: %4.2f',inst{ino,4},-1000*0.41*pfnl.p*ustar,pfnl.r2);
+         %title(ttext)
+         ylim([0.1 2])
+      end
+   end
+   %% LISST density - special case
+   plotnum=6;
+   ino=[1]
+   disp('LISST density')
+   allt=ba.(inst{ino,1});
+   allz=ba.(inst{ino,2});
+   allc=ba.(inst{5,3})./ba.(inst{1,3});
+   
+   % find target time
+   i = find(allt(6,:)>=dnt(1+(ii-1)*N) & allt(6,:)<dnt(ii*N));     
+   c = nanmean(allc(:,i)')';
+   z = allz(:,floor(mean(i)));
+   t = nanmean(allt(:,floor(mean(i))));
+
+   ok = (~isnan(c+z));
+   
+   if(sum(ok)>3)
+      datestr(t)
+      subplot(2,3,6)
+      %plot_snippet
+      hp=plot(c(ok),z(ok),'ok');
+      ylabel('Elevation [m]')
+      xlabel('LISST Density Proxy');
+      ylim([0.1 2])
+      %ttext = sprintf('%s w_s: %4.2f r^2: %4.2f',inst{ino,4},-1000*0.41*pfnl.p*ustar,pfnl.r2);
+      %title(ttext)
+      
+   end
+   %%
+   %pause
+   shg
+   pfn = sprintf('./%s/p%d.png',plotdir,fix(ydayc*100))
+   print(pfn,'-dpng')
+end

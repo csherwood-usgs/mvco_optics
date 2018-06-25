@@ -151,7 +151,7 @@ for i=1:ncs
         end
     end 
 end
-%%     Figure creation 
+%%     Figure creation
 figure(1);clf
 set(gcf,'PaperPosition',[.5,.5,10,8]);
 subplot ('Position',[0.1100    0.7093    0.2012    0.2157])
@@ -218,9 +218,17 @@ set(hle,'Position',[0.8965    0.2815    0.0558    0.6240]);
 title('(g)  Concentration (kg m^{-3})','FontSize',13,'FontWeight','bold')
 ylabel('Elevation (m)')
 xlabel('Concentration (kg m^{-3})')
-%% output
+% Figure 1 output
 eval(['print -dpng Fig4_',run_name,'_redone.png'])
 eval(['print -depsc -zbuffer Fig10_',run_name,'_redone.eps'])
+
+%% Figure 2 plots of response
+% load the alpha_v
+a=load('alpha_v_nf2.txt')
+alpha_v(i) 
+figure(2); clf
+subplot(4,2,1)
+
 end
 
 
