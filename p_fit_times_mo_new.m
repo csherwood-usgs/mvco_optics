@@ -40,17 +40,25 @@ inst = {...
 za = 0.1; % (m) Ca estimates standardized to this elevation
 nav = 0;  % number of profiles to left and right to be averaged
 %list of target year days
-% ydt = [261:(1/3)/24:263];
+
+% Changes from Emmanuel's version in this section make all of the plots for
+% one period end up on the same plot
+
+% do all of them
+%  ydt = [261:(1/3)/24:288];
+%  plotdir = 'new'
+ 
+ydt = [261:(1/3)/24:263];
 % plotdir = 'maria'
 % 
- ydt = [261:(1/3)/24:288];
+% ydt = [268:(1/3)/24:278];
 % plotdir = 'spgtides'
 
 % ydt = [274:(1/3)/24:276];
 % plotdir = 'ophelia'
 % 
- %ydt = [280:(1/3)/24:282];
- plotdir = 'new'
+% ydt = [280:(1/3)/24:282];
+% plotdir = 'calm'
 % 
 % ydt = [286:(1/3)/24:288];
 % plotdir = 'noreaster'
@@ -61,9 +69,11 @@ datestr(dnt);
 %%
 ii=1
 N=3;
+figure(1); clf
+figure(2); clf
 for ii=1:length(dnt)/N
    
-   figure(1); clf
+   figure(1); hold on
    %% info box
    %subplot(4,3,3)
    xlim([0 1])
@@ -82,7 +92,7 @@ for ii=1:length(dnt)/N
    text(0.1,.4,sprintf('zo : % 6.4f m',zo))
    set(gca,'Visible','off') 
    
-   figure(2); clf
+   figure(2); hold on
    %% Cp650
    plotnum=1;
    ino=[7]
@@ -114,13 +124,14 @@ for ii=1:length(dnt)/N
    
    if(sum(ok)>3)
       subplot(2,3,1)
+      hold on
       plot_snippet_new
       xlabel('c_p(650) and 40xb_{bp}(650) m^{-1} )');
       ttext1 = sprintf('ws_cp= %4.2f  ws_bbp=%4.2f',-1000*0.41*pfnl.p*ustar,-1000*0.41*pfnl2.p*ustar)
       title(ttext1);
       %xlabel('Attenuation ( m^{-1} )');
 %      ttext = sprintf('%s w_s: %4.2f r^2: %4.2f',inst{ino,4},-1000*0.41*pfnl2.p*ustar,pfnl2.r2)
-      hold off
+%       hold off
    end
    
    %% UME gamma
@@ -148,6 +159,7 @@ for ii=1:length(dnt)/N
       if(sum(ok)>3)
          datestr(t)
          subplot(2,3,2)
+         hold on
          %plot_snippet
          hp=plot(c(ok),z(ok),'ok');
          set(hp,'markerfacecolor',[0 0 1],'markeredgecolor',[0,0,1])
@@ -156,7 +168,7 @@ for ii=1:length(dnt)/N
          set(hp2,'markerfacecolor',[1 0 0],'markeredgecolor',[1,0,0])
          xlabel('\gamma_{cp}(R), \gamma_{bbp}(K)+0.3');
          ylabel('Elevation [m]')
-         hold off
+%          hold off
          ylim([0.1 2])
          %ttext = sprintf('%s w_s: %4.2f r^2: %4.2f',inst{ino,4},-1000*0.41*pfnl.p*ustar,pfnl.r2);
          %title(ttext)
@@ -187,6 +199,7 @@ for ii=1:length(dnt)/N
       %         datestr(tmin)
       %         datestr(tmax)
       subplot(2,3,3)
+      hold on
       %plot_snippet
        hp=plot(c(ok),z(ok),'ok');
       ylabel('Elevation [m]')
@@ -221,6 +234,7 @@ for ii=1:length(dnt)/N
       if(sum(ok)>3)
          datestr(t)
          subplot(2,3,4)
+         hold on
          hp=plot(c(ok),z(ok),'ok');
          ylabel('Elevation [m]')
          xlabel('b_{bp}/b_p(650)');
@@ -254,6 +268,7 @@ for ii=1:length(dnt)/N
       if(sum(ok)>3)
          datestr(t)
          subplot(2,3,5)
+         hold on
          hp=plot(c(ok),z(ok),'ok');
          ylabel('Elevation [m]')
          xlabel('Chl/c_p(650)');
@@ -281,6 +296,7 @@ for ii=1:length(dnt)/N
    if(sum(ok)>3)
       datestr(t)
       subplot(2,3,6)
+      hold on
       %plot_snippet
       hp=plot(c(ok),z(ok),'ok');
       ylabel('Elevation [m]')
@@ -293,6 +309,6 @@ for ii=1:length(dnt)/N
    %%
    %pause
    shg
-   pfn = sprintf('./%s/p%d.png',plotdir,fix(ydayc*100))
-   print(pfn,'-dpng')
+%    pfn = sprintf('./%s/p%d.png',plotdir,fix(ydayc*100))
+%    print(pfn,'-dpng')
 end
