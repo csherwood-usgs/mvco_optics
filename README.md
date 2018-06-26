@@ -74,6 +74,8 @@ Important processing scripts that have not been copied into this repo are:
 
 * `bin_ave_var_suspsed_insts.m` - Bin averages raw data (as posted in data release) to make profile .mat files (e.g., `suspsed_ba_20_20rstrim_crs_cen.mat`). The number (e.g., 20) indicates the minutes for bin-average...20 = 1 profile, 40 = 2 profiles, 80 = 3 profiles. The `var` here indicates that variance results are also produced. `cen` in the output file name means that bin centers are included for some (but not all) of the instruments. (Why not all? Might need to look back at this aspect.) The product of this script does not include any of the finest LISST sizes...the first 13 bins are all zeros, as is the input data...so it is not a problem with the script, and may be a result of the LISST data processing choices.
 
+This script was slightly modified to process a different LISST output file, producing a new bin-averaged datafile called `suspsed_ba_20rstrim_crs_cen_june_25_2018` which does have information in the first LISST bins. The input file from the STG server was `..\Stg-proc\data\MVCO_11\910moving_arm\9109armlisst\Processing\Spherical\MVCO_lstats.mat`, dated 8/15/2012. This looks like the most-recently produced LISST output file, and (I think) it was processed using LISST SOP 5.
+
 * `plot_pfa_ts.m` - prepares data for `fdyn.m`
   * Loads the time series data `ustar_av.mat` created by `plot_ustar.m`
   * Loads LISST size bins from `lisst_av`
@@ -86,7 +88,9 @@ Scripts included in this repo are:
 
 * `ws_fit_mo.m` - Fits Rouse profiles to profile data (e.g., `suspsed_ba20_20rstrim_crs_cen.mat`) using both linear and non-linear fitting routines. The `mo` suffix indicates this file has been derived from un-prefixed version in `data_proc` directory. This was a preliminary start on plotting, and can probably be removed from the repo.
 
-* `p_fit_times_mo.m` - Derivative of `ws_fit_mo.m` restructured to produce profiles of many instruments for one time period. This is still a work in progress. It calls fitting routines `pfit.m` and `pfit_nlp.m`, which require `lsfit.m`, and the plots are made with a `plot_snippet.m'. At the top of this script, some days
+* `p_fit_times_mo.m` - Derivative of `ws_fit_mo.m` restructured to produce profiles of many instruments for one time period. This is still a work in progress. It calls fitting routines `pfit.m` and `pfit_nlp.m`, which require `lsfit.m`, and the plots are made with a `plot_snippet.m'.
+
+* `p_fit_times_mo_new.m` (and `plot_snippet_new.m`) - These are versions of the the script described above revised by Emmanuel to a) plot a preferred selection of profiles and b) change the temporal interpolation of ustar.
 
 ## Preliminary Results
 
