@@ -13,7 +13,8 @@ ewus = ew.*us;
 ewspeed = ew.*speed;
 
 % 20-minute bin averages
-load suspsed_ba20_20rstrim_crs_cen
+% load suspsed_ba20_20rstrim_crs_cen % (missing small LISST bins)
+load suspsed_ba20_20rstrim_crs_cen_june_25_2018.mat
 % use bin centers when available
 inst = {...
    'LISSTtc','LISSTzc','LISSTvtot','LISST Tot. Vol.';...
