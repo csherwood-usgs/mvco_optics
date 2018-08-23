@@ -113,8 +113,11 @@ for ii=1:length(dnt)/N
    %pause
    
    figure(2); clf
-   input('Resize Figure 2 and hit return')
-   %% Cp650
+   fig = gcf;
+   fig.Position =[397 288 913 1027];
+   fig.PaperPositionMode = 'auto';
+
+   %% Cp650 and Bbp650
    plotnum=1;
    ino=[7]
    disp('UME Cp650')
@@ -130,15 +133,15 @@ for ii=1:length(dnt)/N
    
    % find target time
    i = find(allt(6,:)>=dnt(1+(ii-1)*N) & allt(6,:)<dnt(ii*N));
-
+   
    % cp 650 attenuation
    c = nanmean(allc(:,i)')';
    varc = allvc(:,i);
    
    % bs 650 backscatter
    % scale to fit on same x axis
-%    d = nanmean(alld(:,i)')'*40;
-%    vard = allvd(:,i)*40;
+   %    d = nanmean(alld(:,i)')'*40;
+   %    vard = allvd(:,i)*40;
    % no scaling for dual axes
    d = nanmean(alld(:,i)')';
    vard = allvd(:,i);
@@ -155,57 +158,65 @@ for ii=1:length(dnt)/N
    bpcol = [1 .2 .2]
    
    if(sum(ok)>3)
-      subplot(2,3,1)
       % script plot_snippet is replaced by custom text here
       pf = pfit( c(ok), z(ok),0, za);
       zest = logspace( log10(pf.za),log10(max(z(ok))), 20);
       pf2 = pfit( d(ok), z(ok),0, za);
       zest2 = logspace( log10(pf2.za),log10(max(z(ok))), 20);
-      %Cest = pf.Ca*(zest./za).^pf.p;
-      %plot(Cest,zest,'--k','linewidth',2)
-      %hold on
+      
       pfnl = pfit_nlp( c(ok), z(ok), varc(ok),0, za);
       pfnl2 = pfit_nlp( d(ok), z(ok), vard(ok),0, za);
       % normalize the nl fit by the linear Ca
-      Cest_nl = pfnl.Ca*(zest./za).^pfnl.p;
-      Cest_nl2 = pfnl2.Ca*(zest2./za).^pfnl2.p;
-      % plot 
+      Cest_nl = pfnl.Ca*(zest./za).^pfnl.p; % cp
+      Cest_nl2 = pfnl2.Ca*(zest2./za).^pfnl2.p; % bs
+      
+      
+      % plot cp in blue
+      subplot(2,3,1)
       plot(Cest_nl,zest,'--b','linewidth',2);
-         hold on
+      hold on
       hp=plot(c(ok),z(ok),'ob');
       set(hp,'MarkerFaceColor',[0 0 1])
       set(gca,'YLim',[.1 2])
       set(gca,'XColor',[0 0 1])
-
-      ylabel('Elevation [m]')
+      
+      ylabel('Elevation [m]','fontsize',14)
       ts = sprintf('%s\nN=%d\nCa=%7.2f\np=% 5.2f\nr^2=%06.4f\nCa_n=%7.2f\np_n=% 5.2f\nr_n^2=%06.4f',...
          datestr(t,'dd-mmm-yyyy HHMM'),pf.N,pf.Ca,-pf.p,pf.r2,pfnl.Ca,-pfnl.p,pfnl.r2)
-
-      hx=xlabel('c_p(650) and b_{bp}(650) m^{-1} )');
+      
+      hx=xlabel('{\color{blue}{\itc_{p(650)}}} and {\color{red}{\itb_{bp(650)}}} m^{-1}',...
+                  'fontsize',14);
       set(hx,'Color','k')
       
       % get axis info
       ax1 = gca;
       ax1_pos = ax1.Position;
       ax1_YLim = ax1.YLim;
-            
+      
       % create second axis on top
-      ax2 = axes('Position',ax1_pos,...
+      ax2 = axes(...
          'XAxisLocation','top',...
          'YAxisLocation','right',...
          'Color','none')
-      line(Cest_nl2,zest2,'Parent',ax2,'Color','r')
+
+      % plot bp in red
+      hl=line(Cest_nl2,zest2,'Parent',ax2,'Color','r')
+      set(hl,'Linewidth',2)
       hold on
       hp2=plot(d(ok),z(ok),'or');
       set(hp2,'MarkerFaceColor',[1 0 0])
-
+      
       set(gca,'YLim',ax1_YLim);
       set(gca,'XColor',[1 0 0 ])
-      set(gca,'YTickLabel',[])
+      %set(gca,'YTickLabel',[])
+      Yax=get(gca,'Yaxis')
+      set(Yax,'Visible','off')
+      set(gca,'Position',ax1_pos)
+      set(ax1,'Position',ax1_pos)
       
-      ttext1 = sprintf('ws_{cp}= %4.2f  ws_{bbp}=%4.2f',-1000*0.41*pfnl.p*ustar,-1000*0.41*pfnl2.p*ustar)
+      ttext1 = sprintf('ws_{cp}= %4.2f ws_{bbp}=%4.2f',-1000*0.41*pfnl.p*ustar,-1000*0.41*pfnl2.p*ustar)
       ht=title(ttext1);
-
+      
    end
    
    nanmean(c)
@@ -239,18 +250,53 @@ for ii=1:length(dnt)/N
    if(sum(ok)>3)
       datestr(t)
       subplot(2,3,2)
-      %plot_snippet
-      hp=plot(c(ok),z(ok),'ok');
+      
+      % plot gamma_cp in blue
+      hp=plot(c(ok),z(ok),'ob');
       set(hp,'markerfacecolor',[0 0 1],'markeredgecolor',[0,0,1])
       hold on
-      hp2=plot(gamma_bb(ok)+0.2,z(ok),'ok');
-      set(hp2,'markerfacecolor',[1 0 0],'markeredgecolor',[1,0,0])
-      xlabel('\gamma_{cp}(B), \gamma_{bbp}+0.2(R)');
-      ylabel('Elevation [m]')
-      hold off
-      ylim([0.1 2])
-      %ttext = sprintf('%s w_s: %4.2f r^2: %4.2f',inst{ino,4},-1000*0.41*pfnl.p*ustar,pfnl.r2);
-      %title(ttext)
+      set(gca,'YLim',[.1 2])
+      set(gca,'XColor',[0 0 1])
+      
+      %ylabel('Elevation [m]')
+      ts = sprintf('%s\nN=%d\nCa=%7.2f\np=% 5.2f\nr^2=%06.4f\nCa_n=%7.2f\np_n=% 5.2f\nr_n^2=%06.4f',...
+         datestr(t,'dd-mmm-yyyy HHMM'),pf.N,pf.Ca,-pf.p,pf.r2,pfnl.Ca,-pfnl.p,pfnl.r2)
+      hx=xlabel('{\it{\color{blue}\gamma_{cp}}} and {\it{\color{red}\gamma_{bbp}}}',...
+         'fontsize',14);
+      set(hx,'Color','k')
+
+     
+      % get axis info
+      ax1 = gca;
+      ax1_pos = ax1.Position;
+      ax1_YLim = ax1.YLim;
+      
+      % create second axis on top
+      ax2 = axes('Position',ax1_pos,...
+         'XAxisLocation','top',...
+         'YAxisLocation','right',...
+         'Color','none')
+
+      % plot gamma bb in red
+      % (for some reason, the plot command won't work...so use line, but
+      % make it invisble below. WTF)
+      hp2=line(gamma_bb(ok),z(ok),'Parent',ax2,'Color','r');
+      hold on
+      hp3=plot(gamma_bb(ok),z(ok),'or')
+      set(hp3,'markerfacecolor',[1 0 0],'markeredgecolor',[1,0,0],'Parent',ax2)
+      set(hp2,'Color','none')
+
+      
+
+      set(gca,'YLim',ax1_YLim);
+      set(gca,'XColor',[1 0 0 ])
+      %set(gca,'YTickLabel',[])
+      Yax=get(gca,'Yaxis')
+      set(Yax,'Visible','off')
+      set(gca,'Position',ax1_pos)
+      set(ax1,'Position',ax1_pos)
+
+
    end
    nanmean(c(ok))
    nanstd(c(ok))
@@ -259,7 +305,7 @@ for ii=1:length(dnt)/N
    
    
    
-   %% LISST D50
+   %% LISST D50 and rho-1
    plotnum=3;
    ino=[1]
    disp('LISST D50')
@@ -283,23 +329,47 @@ for ii=1:length(dnt)/N
    
    if(sum(ok)>3)
       datestr(t)
-      %         datestr(tmin)
-      %         datestr(tmax)
       subplot(2,3,3)
-      %     plot_snippet
-      hp=plot(c(ok)*8,z(ok),'ok');
+
+      % plot rho-1 in blue
+      hp=plot(c(ok),z(ok),'ob');
       set(hp,'markerfacecolor',[0 0 1],'markeredgecolor',[0,0,1])
       hold on
-      hp2=plot(d(ok),z(ok),'ok');
-      set(hp2,'markerfacecolor',[1 0 0],'markeredgecolor',[1,0,0])
-      hold off
+      set(gca,'YLim',[.1 2])
+      set(gca,'XColor',[0 0 1])
       
-      ylabel('Elevation [m]')
-      xlabel('8\times\rho_a^{-1}(B), D_s(R)');
-      %       ttext = sprintf('%s w_s: %4.2f r^2: %4.2f',inst{ino,4},-1000*0.41*pfnl.p*ustar,pfnl.r2);
-      %       title(ttext)
+      %ylabel('Elevation [m]')
+      hx=xlabel('{\color{blue}{\it\rho_a^{-1}}} and {\color{red}{\itD_s}[\mum]}',...
+                  'fontsize',14);
+      set(hx,'Color','k')
+     
+      % get axis info
+      ax1 = gca;
+      ax1_pos = ax1.Position;
+      ax1_YLim = ax1.YLim;
+      
+      % create second axis on top
+      ax2 = axes('Position',ax1_pos,...
+         'XAxisLocation','top',...
+         'YAxisLocation','right',...
+         'Color','none')
+
+      % plot Ds in red
+      % (for some reason, the plot command won't work...so use line, but
+      % make it invisble below. WTF)
+      hp2=line(gamma_bb(ok),z(ok),'Parent',ax2,'Color','r');
+      hold on
+      hp3=plot(gamma_bb(ok),z(ok),'or')
+      set(hp3,'markerfacecolor',[1 0 0],'markeredgecolor',[1,0,0],'Parent',ax2)
+      set(hp2,'Color','none')
+      set(gca,'YLim',ax1_YLim);
+      set(gca,'XColor',[1 0 0 ])
+      %set(gca,'YTickLabel',[])
+      Yax=get(gca,'Yaxis')
+      set(Yax,'Visible','off')
+      set(gca,'Position',ax1_pos)
+      set(ax1,'Position',ax1_pos)
    end
-   ylim([0.1 2])
    nanmean(c(ok))
    nanstd(c(ok))
    nanmean(d(ok))
@@ -333,8 +403,8 @@ for ii=1:length(dnt)/N
          subplot(2,3,4)
          hp=plot(c(ok),z(ok),'ok');
          set(hp,'markerfacecolor','k','markeredgecolor','k')
-         ylabel('Elevation [m]')
-         xlabel('b_{bp}/b_p(650)');
+         ylabel('Elevation [m]','fontsize',14)
+         xlabel('{\itb_{bp(650)}/b_{p(650)}}[ ]','fontsize',14);
          %ttext = sprintf('%s w_s: %4.2f r^2: %4.2f',inst{ino,4},-1000*0.41*pfnl.p*ustar,pfnl.r2);
          %title(ttext)
          ylim([0.1 2])
@@ -373,8 +443,8 @@ for ii=1:length(dnt)/N
          subplot(2,3,5)
          hp=plot(c(ok),z(ok),'ok');
          set(hp,'markerfacecolor','k','markeredgecolor','k')
-         ylabel('Elevation [m]')
-         xlabel('Chl/c_p(650)');
+         %ylabel('Elevation [m]')
+         xlabel('{\itChl/c_{p(650)}}','fontsize',14);
          %ttext = sprintf('%s w_s: %4.2f r^2: %4.2f',inst{ino,4},-1000*0.41*pfnl.p*ustar,pfnl.r2);
          %title(ttext)
          ylim([0.1 2])
@@ -407,23 +477,61 @@ for ii=1:length(dnt)/N
    if(sum(ok)>3)
       datestr(t)
       subplot(2,3,6)
-      %plot_snippet
-      hp=plot(c(ok),z(ok),'ok');
-      ylabel('Elevation [m]')
+% % %       %plot_snippet
+% % %       hp=plot(c(ok),z(ok),'ok');
+% % %       ylabel('Elevation [m]')
+% % %       set(hp,'markerfacecolor',[0 0 1],'markeredgecolor',[0,0,1])
+% % %       hold on
+% % %       hp2=plot(d(ok),z(ok),'ok');
+% % %       set(hp2,'markerfacecolor',[1 0 0],'markeredgecolor',[1,0,0])
+% % %       hold off
+% % %       ylim([0.1 2])
+% % %       xlabel('V_f/V_m (B) 3xV_f/V_M(R)');
+
+      % plot rho-1 in blue
+      hp=plot(c(ok),z(ok),'ob');
       set(hp,'markerfacecolor',[0 0 1],'markeredgecolor',[0,0,1])
       hold on
-      hp2=plot(d(ok),z(ok),'ok');
-      set(hp2,'markerfacecolor',[1 0 0],'markeredgecolor',[1,0,0])
-      hold off
-      ylim([0.1 2])
-      xlabel('V_f/V_m (B) 3xV_f/V_M(R)');
+      set(gca,'YLim',[.1 2])
+      set(gca,'XColor',[0 0 1])
+      
+      %ylabel('Elevation [m]')
+      hx=xlabel('{\color{blue}{\itV_f / V_m}} and {\color{red}{\itV_f / V_M}} [ ]',...
+         'fontsize',14);
+
+      set(hx,'Color','k')
+     
+      % get axis info
+      ax1 = gca;
+      ax1_pos = ax1.Position;
+      ax1_YLim = ax1.YLim;
+      
+      % create second axis on top
+      ax2 = axes('Position',ax1_pos,...
+         'XAxisLocation','top',...
+         'YAxisLocation','right',...
+         'Color','none')
+
+      % plot Ds in red
+      % (for some reason, the plot command won't work...so use line, but
+      % make it invisble below. WTF)
+      hp2=line(gamma_bb(ok),z(ok),'Parent',ax2,'Color','r');
+      hold on
+      hp3=plot(gamma_bb(ok),z(ok),'or')
+      set(hp3,'markerfacecolor',[1 0 0],'markeredgecolor',[1,0,0],'Parent',ax2)
+      set(hp2,'Color','none')
+      set(gca,'YLim',ax1_YLim);
+      set(gca,'XColor',[1 0 0 ])
+      %set(gca,'YTickLabel',[])
+      Yax=get(gca,'Yaxis')
+      set(Yax,'Visible','off')
+      set(gca,'Position',ax1_pos)
+      set(ax1,'Position',ax1_pos)
+      
       nanmean(c(ok))
       nanstd(c(ok))
       nanmean(d(ok)/3)
-      nanstd(d(ok)/3)
-      
-      
-      
+      nanstd(d(ok)/3)   
    end
    %%
    %pause
