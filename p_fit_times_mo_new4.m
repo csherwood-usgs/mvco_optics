@@ -46,7 +46,7 @@ inst = {...
    'UMEtc','UMEzc','UMEgamma','gamma';...
    };
 
-%compute the Sauter diameter
+%compute the Sauter diameter and some other stuff we will plot
 for i=1:12
    for j=1:2442
       Lisst_sumV(i,j)=nansum(ba.LISSTvconc(i,j,:));
@@ -68,38 +68,9 @@ D_S=3/2*Lisst_sumV./Lisst_sumA;
 Agg_Dens=ba.(inst{5,3})./ba.(inst{1,3});
 f_over_m=Lisst_sumV_fines./Lisst_sumV_micro;
 f_over_ma=Lisst_sumV_fines./Lisst_sumV_macro;
-% other stuff we will plot:
-
 
 za = 0.1; % (m) Ca estimates standardized to this elevation
-% % % % nav = 0;  % number of profiles to left and right to be averaged
-% % % %
-% % % % %list of target year days
-% % % % % ydt = [261:(1/3)/24:263];
-% % % % % plotdir = 'maria'
-% % % % %
-% % % % Maria_t = yday_off+[261, 261.3];
-% % % % %ydt = [268+(18/3)/24:(1/3)/24:269];
-% % % % Spgtide_t = yday_off+[%ydt = [275:(1/3)/24:276];
-% % % % ydt =[281+(18/3)/24:(1/3)/24:282];
-% % % % %,268+(2/3)/24:(1/3)/24:269,275:(1/3)/24:276];%,281+(2/3)/24:(1/3)/24:282,286:(1/3)/24:287];
-% % % % % plotdir = 'spgtides'
-% % % %
-% % % % % ydt = [274:(1/3)/24:276];
-% % % % % plotdir = 'ophelia'
-% % % % %
-% % % % %ydt = [280:(1/3)/24:282];
-% % % % plotdir = 'new';
-% % % % %
-% % % % % ydt = [286:(1/3)/24:288];
-% % % % % plotdir = 'noreaster'
-% % % %
-% % % %
-% % % % dnt = yday_off+ydt;
-% % % % datestr(dnt);
-% % % % %
-% % % % ii=1
-% % % % N=3;
+
 %% Here is where we set up cases to plot
 
 % interpolate wave stresses to profile times
@@ -136,22 +107,20 @@ cases(5).te = 287;
 yday_off = datenum('1-Jan-2011 00:00:00');
 tiyd = ti-yday_off;
 
+plotdir = 'test'
 
-for icase = 1:1%length(cases)
+for icase = 1:length(cases)
    ba_tindex = tiyd >= cases(icase).ts & tiyd <= cases(icase).te;
    us_tindex = dus-yday_off >= cases(icase).ts & dus-yday_off <= cases(icase).te;
    disp(cases(icase).name)
-
+   
    % indices
    ius = us_tindex;
    i = ba_tindex;
    disp(sum(i))
    
+   % info box
    figure(1); clf
-   %% info box
-   %subplot(4,3,3)
-   %    xlim([0 1])
-   %    ylim([0 1])
    sp_t=nanmean(abs(speed(ius)));
    us_t=nanmean(us(ius));
    uswc_t=nanmean(us_wc(ius));
@@ -185,34 +154,25 @@ for icase = 1:1%length(cases)
    allvc=vv.(inst{ino,3});
    allvd=vv.UMEbs650;
    
-   % find target time
-   %i = find(allt(6,:)>=dnt(1+(ii-1)*N) & allt(6,:)<dnt(ii*N));
-   
    % cp 650 attenuation
    c = nanmean(allc(:,i)')';
    varc = allvc(:,i);
-   sdc = sqrt(nansum(allvc(:,i)')');
+   sdc = nanstd(allc(:,i)')';
    
-   % bs 650 backscatter
-   % scale to fit on same x axis
-   %    d = nanmean(alld(:,i)')'*40;
-   %    vard = allvd(:,i)*40;
-   % no scaling for dual axes
    d = nanmean(alld(:,i)')';
-   vard =allvd(:,i); 
-   sdd = sqrt(nansum(allvd(:,i)')');
+   vard =allvd(:,i);
+   sdd = nanstd(alld(:,i)')';
    
    z = nanmean(allz(:,i)')';
    t = nanmean(allt(:,i)')';
    fprintf(1,'Mean profile time: %s\n',datestr(t));
-   %ustar = interp1(dus,us,t,'nearest')
    
    ok = (~isnan(c+z));
    
    % colors for cp and bpp
    cpcol = [.2 .2 1]
    bpcol = [1 .2 .2]
-%    
+   %
    if(sum(ok)>3)
       % script plot_snippet is replaced by custom text here
       pf = pfit( c(ok), z(ok),0, za);
@@ -241,6 +201,7 @@ for icase = 1:1%length(cases)
       set(gca,'XColor',[0 0 1])
       
       ylabel('Elevation [m]','fontsize',14)
+      set(gca,'fontsize',11)
       ts = sprintf('%s\nN=%d\nCa=%7.2f\np=% 5.2f\nr^2=%06.4f\nCa_n=%7.2f\np_n=% 5.2f\nr_n^2=%06.4f',...
          datestr(t,'dd-mmm-yyyy HHMM'),pf.N,pf.Ca,-pf.p,pf.r2,pfnl.Ca,-pfnl.p,pfnl.r2)
       
@@ -276,10 +237,10 @@ for icase = 1:1%length(cases)
       set(Yax,'Visible','off')
       set(gca,'Position',ax1_pos)
       set(ax1,'Position',ax1_pos)
-      
-      ttext1 = sprintf('ws_{cp}= %4.2f ws_{bbp}=%4.2f',-1000*0.41*pfnl.p*us_t,-1000*0.41*pfnl2.p*us_t)
-      ht=title(ttext1);
-      
+      set(gca,'fontsize',11)
+          
+      ttext1 = sprintf('ws_{cp}=%4.2f ws_{bbp}=%4.2f',-1000*0.41*pfnl.p*us_t,-1000*0.41*pfnl2.p*us_t)
+      ht=title(ttext1);  
    end
    
    nanmean(c)
@@ -296,15 +257,21 @@ for icase = 1:1%length(cases)
    allz=ba.(inst{ino,2});
    allc=ba.(inst{ino,3});
    alld=ba.UMEbs532;
+   allvd=vv.UMEbs532;
    alle=ba.UMEbs650;
+   allve=vv.UMEbs650;
    
-   % find target time using index
    c = nanmean(allc(:,i)')';
+   sdc = nanstd(allc(:,i)')';
+   
    d = nanmean(alld(:,i)')';
    e = nanmean(alle(:,i)')';
+   
    gamma_bb=(650/532)*log(d./e);
-   z = allz(:,floor(mean(i)));
-   t = nanmean(allt(:,floor(mean(i))));
+   sd_gbb = nanstd( (650/532)*log(alld(:,i)./alle(:,i))')';
+   
+   z = nanmean(allz(:,i)')';
+   t = nanmean(allt(:,i)')';
    tmin = nanmin(nanmin(allt(:,i)));
    tmax = nanmax(nanmax(allt(:,i)));
    ok = (~isnan(c+z));
@@ -317,8 +284,14 @@ for icase = 1:1%length(cases)
       hp=plot(c(ok),z(ok),'ob');
       set(hp,'markerfacecolor',[0 0 1],'markeredgecolor',[0,0,1])
       hold on
+      % error bars
+      for ik = 1:length(ok)
+         plot([max(0,c(ik)-sdc(ik)), c(ik)+sdc(ik)],[z(ik) z(ik)],'+b')
+      end
       set(gca,'YLim',[.1 2])
       set(gca,'XColor',[0 0 1])
+      set(gca,'fontsize',11)
+      set(gca,'Yticklabel',[])
       
       %ylabel('Elevation [m]')
       ts = sprintf('%s\nN=%d\nCa=%7.2f\np=% 5.2f\nr^2=%06.4f\nCa_n=%7.2f\np_n=% 5.2f\nr_n^2=%06.4f',...
@@ -345,13 +318,17 @@ for icase = 1:1%length(cases)
       hp2=line(gamma_bb(ok),z(ok),'Parent',ax2,'Color','r');
       hold on
       hp3=plot(gamma_bb(ok),z(ok),'or')
+      hold on
+      % error bars
+      for ik = 1:length(ok)
+         plot([max(0,gamma_bb(ik)-sd_gbb(ik)), gamma_bb(ik)+sd_gbb(ik)],[z(ik) z(ik)],'+r')
+      end
       set(hp3,'markerfacecolor',[1 0 0],'markeredgecolor',[1,0,0],'Parent',ax2)
       set(hp2,'Color','none')
       
-      
-      
       set(gca,'YLim',ax1_YLim);
       set(gca,'XColor',[1 0 0 ])
+      set(gca,'fontsize',11)
       %set(gca,'YTickLabel',[])
       Yax=get(gca,'Yaxis')
       set(Yax,'Visible','off')
@@ -375,16 +352,13 @@ for icase = 1:1%length(cases)
    %allc=ba.LISSTD50a;
    alld=D_S;
    
-   %    if(ifnorm)
-   %       allc = allc/(nanmean(allc(:)));
-   %    end
-   
    % find target time
-   i = find(allt(6,:)>=dnt(1+(ii-1)*N) & allt(6,:)<dnt(ii*N));
    c = nanmean(allc(:,i)')';
+   sdc=  nanstd(allc(:,i)')';
    d = nanmean(alld(:,i)')';
-   z = allz(:,floor(mean(i)));
-   t = nanmean(allt(:,floor(mean(i))));
+   sdd = nanstd(alld(:,i)')';
+   z = nanmean(allz(:,i)')';
+   t = nanmean(allt(:,i)')';
    ok = (~isnan(c+z));
    
    if(sum(ok)>3)
@@ -395,8 +369,14 @@ for icase = 1:1%length(cases)
       hp=plot(c(ok),z(ok),'ob');
       set(hp,'markerfacecolor',[0 0 1],'markeredgecolor',[0,0,1])
       hold on
+      % error bars
+      for ik = 1:length(ok)
+         plot([max(0,c(ik)-sdc(ik)), c(ik)+sdc(ik)],[z(ik) z(ik)],'+b')
+      end
       set(gca,'YLim',[.1 2])
       set(gca,'XColor',[0 0 1])
+      set(gca,'YTickLabel',[])
+      set(gca,'fontsize',11)
       
       %ylabel('Elevation [m]')
       hx=xlabel('{\color{blue}{\it\rho_a^{-1}}} and {\color{red}{\itD_s}[\mum]}',...
@@ -417,14 +397,17 @@ for icase = 1:1%length(cases)
       % plot Ds in red
       % (for some reason, the plot command won't work...so use line, but
       % make it invisble below. WTF)
-      hp2=line(gamma_bb(ok),z(ok),'Parent',ax2,'Color','r');
+      hp2=line(d(ok),z(ok),'Parent',ax2,'Color','r');
       hold on
-      hp3=plot(gamma_bb(ok),z(ok),'or')
+      for ik = 1:length(ok)
+         plot([max(0., d(ik)-sdd(ik)), d(ik)+sdd(ik)],[z(ik) z(ik)],'+r')
+      end
+      hp3=plot(d(ok),z(ok),'or')
       set(hp3,'markerfacecolor',[1 0 0],'markeredgecolor',[1,0,0],'Parent',ax2)
       set(hp2,'Color','none')
       set(gca,'YLim',ax1_YLim);
       set(gca,'XColor',[1 0 0 ])
-      %set(gca,'YTickLabel',[])
+      set(gca,'fontsize',11)
       Yax=get(gca,'Yaxis')
       set(Yax,'Visible','off')
       set(gca,'Position',ax1_pos)
@@ -445,34 +428,30 @@ for icase = 1:1%length(cases)
       allz=ba.(inst{ino,2});
       allc=(ba.UMEbs650./ba.UMEattn650);
       
-      %       if(ino==8 || ino==16) % no variance for Chl or gamma
-      %          allvc=ones(size(allc));
-      %       else
-      %          allvc=vv.(inst{ino,3});
-      %       end
-      
       % find target time
-      i = find(allt(6,:)>=dnt(1+(ii-1)*N) & allt(6,:)<dnt(ii*N));
       c = nanmean(allc(:,i)')';
-      z = allz(:,floor(mean(i)));
-      t = nanmean(allt(:,floor(mean(i))));
+      sdc = nanstd(allc(:,i)')';
+      
+      z = nanmean(allz(:,i)')';
+      t = nanmean(allt(:,i)')';
       ok = (~isnan(c+z));
       
       if(sum(ok)>3)
          datestr(t)
          subplot(2,3,4)
          hp=plot(c(ok),z(ok),'ok');
+         hold on
          set(hp,'markerfacecolor','k','markeredgecolor','k')
+         % error bars
+         for ik = 1:length(ok)
+            plot([max(0,c(ik)-sdc(ik)), c(ik)+sdc(ik)],[z(ik) z(ik)],'+k')
+         end
          ylabel('Elevation [m]','fontsize',14)
          xlabel('{\itb_{bp(650)}/b_{p(650)}}[ ]','fontsize',14);
-         %ttext = sprintf('%s w_s: %4.2f r^2: %4.2f',inst{ino,4},-1000*0.41*pfnl.p*ustar,pfnl.r2);
-         %title(ttext)
          ylim([0.1 2])
+         set(gca,'fontsize',11)
       end
    end
-   
-   nanmean(c(ok))
-   nanstd(c(ok))
    
    
    
@@ -485,29 +464,27 @@ for icase = 1:1%length(cases)
       allz=ba.(inst{ino,2});
       allc=(ba.(inst{ino,3})./(ba.(inst{7,3})));
       
-      %       if(ino==8 || ino==16) % no variance for Chl or gamma
-      %          allvc=ones(size(allc));
-      %       else
-      %          allvc=vv.(inst{ino,3});
-      %       end
-      
-      % find target time
-      i = find(allt(6,:)>=dnt(1+(ii-1)*N) & allt(6,:)<dnt(ii*N));
       c = nanmean(allc(:,i)')';
-      z = allz(:,floor(mean(i)));
-      t = nanmean(allt(:,floor(mean(i))));
+      sdc = nanstd(allc(:,i)')';
+      z = nanmean(allz(:,i)')';
+      t = nanmean(allt(:,i)')';
       ok = (~isnan(c+z));
       
       if(sum(ok)>3)
          datestr(t)
          subplot(2,3,5)
          hp=plot(c(ok),z(ok),'ok');
+         hold on
+         % error bars
+         for ik = 1:length(ok)
+            plot([max(0,c(ik)-sdc(ik)), c(ik)+sdc(ik)],[z(ik) z(ik)],'+k')
+         end
          set(hp,'markerfacecolor','k','markeredgecolor','k')
-         %ylabel('Elevation [m]')
          xlabel('{\itChl/c_{p(650)}}','fontsize',14);
-         %ttext = sprintf('%s w_s: %4.2f r^2: %4.2f',inst{ino,4},-1000*0.41*pfnl.p*ustar,pfnl.r2);
-         %title(ttext)
+         
          ylim([0.1 2])
+         set(gca,'fontsize',11)
+         set(gca,'Yticklabel',[])
       end
    end
    
@@ -522,16 +499,16 @@ for icase = 1:1%length(cases)
    allt=ba.(inst{ino,1});
    allz=ba.(inst{ino,2});
    allc=f_over_m;
-   alld=f_over_ma*3;
-   %ba.(inst{5,3})./ba.(inst{1,3});
+   alld=f_over_ma;
    
-   % find target time
-   i = find(allt(6,:)>=dnt(1+(ii-1)*N) & allt(6,:)<dnt(ii*N));
    c = nanmean(allc(:,i)')';
-   d = nanmean(alld(:,i)')';
-   z = allz(:,floor(mean(i)));
-   t = nanmean(allt(:,floor(mean(i))));
+   sdc = nanstd(allc(:,i)')';
    
+   d = nanmean(alld(:,i)')';
+   sdd = nanstd(alld(:,i)')';
+   
+   z = nanmean(allz(:,i)')';
+   t = nanmean(allt(:,i)')';  
    ok = (~isnan(c+z));
    
    if(sum(ok)>3)
@@ -542,10 +519,14 @@ for icase = 1:1%length(cases)
       hp=plot(c(ok),z(ok),'ob');
       set(hp,'markerfacecolor',[0 0 1],'markeredgecolor',[0,0,1])
       hold on
+      % error bars
+      for ik = 1:length(ok)
+         plot([max(0,c(ik)-sdc(ik)), c(ik)+sdc(ik)],[z(ik) z(ik)],'+b')
+      end
       set(gca,'YLim',[.1 2])
       set(gca,'XColor',[0 0 1])
-      
-      %ylabel('Elevation [m]')
+      set(gca,'Yticklabels',[])
+      set(gca,'fontsize',11)
       hx=xlabel('{\color{blue}{\itV_f / V_m}} and {\color{red}{\itV_f / V_M}} [ ]',...
          'fontsize',14);
       
@@ -565,14 +546,21 @@ for icase = 1:1%length(cases)
       % plot Ds in red
       % (for some reason, the plot command won't work...so use line, but
       % make it invisble below. WTF)
-      hp2=line(gamma_bb(ok),z(ok),'Parent',ax2,'Color','r');
+      hp2=line(c(ok),z(ok),'Parent',ax2,'Color','b');
       hold on
-      hp3=plot(gamma_bb(ok),z(ok),'or')
+      
+
+      hp3=plot(d(ok),z(ok),'or')
+      hold on
+      % error bars
+      for ik = 1:length(ok)
+         plot([max(0,d(ik)-sdd(ik)), d(ik)+sdd(ik)],[z(ik) z(ik)],'+r')
+      end
       set(hp3,'markerfacecolor',[1 0 0],'markeredgecolor',[1,0,0],'Parent',ax2)
       set(hp2,'Color','none')
       set(gca,'YLim',ax1_YLim);
       set(gca,'XColor',[1 0 0 ])
-      %set(gca,'YTickLabel',[])
+      set(gca,'fontsize',11)
       Yax=get(gca,'Yaxis')
       set(Yax,'Visible','off')
       set(gca,'Position',ax1_pos)
