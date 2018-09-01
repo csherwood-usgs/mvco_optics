@@ -45,6 +45,9 @@ inst = {...
    'absstc','absszc','abss3','4 MHz ABSS';...
    'UMEtc','UMEzc','UMEgamma','gamma';...
    };
+% a few of these are negative. Not sure why.
+ineg = ba.UMEbs650 <0.;
+ba.UMEbs650(ineg)=1e-8;
 
 %compute the Sauter diameter and some other stuff we will plot
 for i=1:12
@@ -229,7 +232,10 @@ for icase = 1:length(cases)
       set(hp,'MarkerFaceColor',[0 0 1])
       set(gca,'YLim',[.1 2])
       set(gca,'XColor',[0 0 1])
-      if(fixx), set(gca,'XLim',[0 40]); end
+      % if(fixx), set(gca,'XLim',[0 40]); end
+      set(gca,'Xscale','log')
+      set(gca,'XLim',[.1, 50])
+      set(gca,'Xtick',[.1, 1, 10])
       ylabel('Elevation [m]','fontsize',14)
       set(gca,'fontsize',11)
       ts = sprintf('%s\nN=%d\nCa=%7.2f\np=% 5.2f\nr^2=%06.4f\nCa_n=%7.2f\np_n=% 5.2f\nr_n^2=%06.4f',...
@@ -262,7 +268,9 @@ for icase = 1:length(cases)
       
       set(gca,'YLim',ax1_YLim);
       set(gca,'XColor',[1 0 0 ])
-      if(fixx), set(gca,'XLim',[0 0.7]); end
+      %if(fixx), set(gca,'XLim',[0 0.7]); end
+       set(gca,'Xscale','log')
+      set(gca,'XLim',[.01, 1])
       Yax=get(gca,'Yaxis')
       set(Yax,'Visible','off')
       set(gca,'Position',ax1_pos)
