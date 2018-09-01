@@ -73,6 +73,7 @@ za = 0.1; % (m) Ca estimates standardized to this elevation
 
 %% Here is where we set up cases to plot
 
+
 % interpolate wave stresses to profile times
 ti = ba.ADVtc(5,:);
 uwi = interp1(dus,us_wave,ti);
@@ -103,12 +104,39 @@ cases(5).name = 'Noreaster';
 cases(5).ts = 286;
 cases(5).te = 287;
 
+if(1) % replace the times with my best guess of Emmanuel's times
+   % little function to convert hour to decimal day and subtract two
+   % minutes
+   dch =@(h) h/24.- 2./60./24.;
+   % 62 minutes later (three profiles)
+   min62 = 1./24.+(2./60.)/24.
+   cases(1).name = 'Fig3';
+   cases(1).ts = 261.+dch(2.)
+   cases(1).te = cases(1).ts+min62;
+   cases(2).name = 'Fig4';
+   cases(2).ts = 268.+dch(14.);
+   cases(2).te = cases(2).ts+2*min62;
+   cases(3).name = 'Fig5';
+   cases(3).ts = 275.+dch(4.)
+   cases(3).te = cases(3).ts+2*min62;
+   cases(4).name = 'Fig6';
+   cases(4).ts = 281.+dch(22.)
+   cases(4).te = cases(4).ts+min62;
+   cases(5).name = 'Fig6';
+   cases(5).ts = 286.+dch(2.)
+   cases(5).te = cases(5).ts+min62;
+end
 % conversion from datenum time to year day
 yday_off = datenum('1-Jan-2011 00:00:00');
 tiyd = ti-yday_off;
 
 plotdir = 'test'
+% open a file to record stats
+sfname = ['./',plotdir,'/stats.txt']
+fid = fopen(sfname,'w');
 
+% fix that xlimits for all plots?
+fixx = 1
 for icase = 1:length(cases)
    ba_tindex = tiyd >= cases(icase).ts & tiyd <= cases(icase).te;
    us_tindex = dus-yday_off >= cases(icase).ts & dus-yday_off <= cases(icase).te;
@@ -137,6 +165,8 @@ for icase = 1:length(cases)
    text(0.1,.4,sprintf('zo : % 6.4f m',zo_t))
    set(gca,'Visible','off')
    %pause
+   fprintf(fid,'%5d, %6.2f, %6.2f, %5.2f, %5.3f, %5.3f, %6.4f\n',fix(100*ydayc),min(tiyd(i)),max(tiyd(i)),...
+      sp_t,uswc_t,us_t,zo_t);
    
    figure(2); clf
    fig = gcf;
@@ -156,11 +186,11 @@ for icase = 1:length(cases)
    
    % cp 650 attenuation
    c = nanmean(allc(:,i)')';
-   varc = allvc(:,i);
+   varc = nanvar(allvc(:,i)')';
    sdc = nanstd(allc(:,i)')';
    
    d = nanmean(alld(:,i)')';
-   vard =allvd(:,i);
+   vard =nanvar(allvd(:,i)')';
    sdd = nanstd(alld(:,i)')';
    
    z = nanmean(allz(:,i)')';
@@ -199,7 +229,7 @@ for icase = 1:length(cases)
       set(hp,'MarkerFaceColor',[0 0 1])
       set(gca,'YLim',[.1 2])
       set(gca,'XColor',[0 0 1])
-      
+      if(fixx), set(gca,'XLim',[0 40]); end
       ylabel('Elevation [m]','fontsize',14)
       set(gca,'fontsize',11)
       ts = sprintf('%s\nN=%d\nCa=%7.2f\np=% 5.2f\nr^2=%06.4f\nCa_n=%7.2f\np_n=% 5.2f\nr_n^2=%06.4f',...
@@ -232,15 +262,15 @@ for icase = 1:length(cases)
       
       set(gca,'YLim',ax1_YLim);
       set(gca,'XColor',[1 0 0 ])
-      %set(gca,'YTickLabel',[])
+      if(fixx), set(gca,'XLim',[0 0.7]); end
       Yax=get(gca,'Yaxis')
       set(Yax,'Visible','off')
       set(gca,'Position',ax1_pos)
       set(ax1,'Position',ax1_pos)
       set(gca,'fontsize',11)
-          
+      
       ttext1 = sprintf('ws_{cp}=%4.2f ws_{bbp}=%4.2f',-1000*0.41*pfnl.p*us_t,-1000*0.41*pfnl2.p*us_t)
-      ht=title(ttext1);  
+      ht=title(ttext1);
    end
    
    nanmean(c)
@@ -289,6 +319,8 @@ for icase = 1:length(cases)
          plot([max(0,c(ik)-sdc(ik)), c(ik)+sdc(ik)],[z(ik) z(ik)],'+b')
       end
       set(gca,'YLim',[.1 2])
+      if(fixx), set(gca,'XLim',[0 0.6]); end
+
       set(gca,'XColor',[0 0 1])
       set(gca,'fontsize',11)
       set(gca,'Yticklabel',[])
@@ -296,7 +328,7 @@ for icase = 1:length(cases)
       %ylabel('Elevation [m]')
       ts = sprintf('%s\nN=%d\nCa=%7.2f\np=% 5.2f\nr^2=%06.4f\nCa_n=%7.2f\np_n=% 5.2f\nr_n^2=%06.4f',...
          datestr(t,'dd-mmm-yyyy HHMM'),pf.N,pf.Ca,-pf.p,pf.r2,pfnl.Ca,-pfnl.p,pfnl.r2)
-      hx=xlabel('{\it{\color{blue}\gamma_{cp}}} and {\it{\color{red}\gamma_{bbp}}}',...
+      hx=xlabel('{\it{\color{blue}\gamma_{cp}}} and {\it{\color{red}\gamma_{bbp}}} [ ]',...
          'fontsize',14);
       set(hx,'Color','k')
       
@@ -329,7 +361,7 @@ for icase = 1:length(cases)
       set(gca,'YLim',ax1_YLim);
       set(gca,'XColor',[1 0 0 ])
       set(gca,'fontsize',11)
-      %set(gca,'YTickLabel',[])
+      if(fixx), set(gca,'XLim',[0 0.4]); end
       Yax=get(gca,'Yaxis')
       set(Yax,'Visible','off')
       set(gca,'Position',ax1_pos)
@@ -376,10 +408,12 @@ for icase = 1:length(cases)
       set(gca,'YLim',[.1 2])
       set(gca,'XColor',[0 0 1])
       set(gca,'YTickLabel',[])
+      if(fixx), set(gca,'XLim',[0 30]); end
+
       set(gca,'fontsize',11)
       
       %ylabel('Elevation [m]')
-      hx=xlabel('{\color{blue}{\it\rho_a^{-1}}} and {\color{red}{\itD_s}[\mum]}',...
+      hx=xlabel('{\color{blue}{\it\rho_a^{-1}} [\mum^3 m^{-1}]} and {\color{red}{\itD_s}[\mum]}',...
          'fontsize',14);
       set(hx,'Color','k')
       
@@ -406,6 +440,8 @@ for icase = 1:length(cases)
       set(hp3,'markerfacecolor',[1 0 0],'markeredgecolor',[1,0,0],'Parent',ax2)
       set(hp2,'Color','none')
       set(gca,'YLim',ax1_YLim);
+      if(fixx), set(gca,'XLim',[0 250.]); end
+
       set(gca,'XColor',[1 0 0 ])
       set(gca,'fontsize',11)
       Yax=get(gca,'Yaxis')
@@ -447,8 +483,10 @@ for icase = 1:length(cases)
             plot([max(0,c(ik)-sdc(ik)), c(ik)+sdc(ik)],[z(ik) z(ik)],'+k')
          end
          ylabel('Elevation [m]','fontsize',14)
-         xlabel('{\itb_{bp(650)}/b_{p(650)}}[ ]','fontsize',14);
+         xlabel('{\itb_{bp(650)}/b_{p(650)}} [ ]','fontsize',14);
          ylim([0.1 2])
+         if(fixx), set(gca,'XLim',[0 0.05]); end
+
          set(gca,'fontsize',11)
       end
    end
@@ -480,8 +518,9 @@ for icase = 1:length(cases)
             plot([max(0,c(ik)-sdc(ik)), c(ik)+sdc(ik)],[z(ik) z(ik)],'+k')
          end
          set(hp,'markerfacecolor','k','markeredgecolor','k')
-         xlabel('{\itChl/c_{p(650)}}','fontsize',14);
-         
+         xlabel('{\itChl/c_{p(650)}} [mg m^{-2}]','fontsize',14);
+         if(fixx), set(gca,'XLim',[0 5.5]); end
+
          ylim([0.1 2])
          set(gca,'fontsize',11)
          set(gca,'Yticklabel',[])
@@ -508,7 +547,7 @@ for icase = 1:length(cases)
    sdd = nanstd(alld(:,i)')';
    
    z = nanmean(allz(:,i)')';
-   t = nanmean(allt(:,i)')';  
+   t = nanmean(allt(:,i)')';
    ok = (~isnan(c+z));
    
    if(sum(ok)>3)
@@ -526,6 +565,8 @@ for icase = 1:length(cases)
       set(gca,'YLim',[.1 2])
       set(gca,'XColor',[0 0 1])
       set(gca,'Yticklabels',[])
+      if(fixx), set(gca,'XLim',[0 0.4]); end
+
       set(gca,'fontsize',11)
       hx=xlabel('{\color{blue}{\itV_f / V_m}} and {\color{red}{\itV_f / V_M}} [ ]',...
          'fontsize',14);
@@ -549,7 +590,7 @@ for icase = 1:length(cases)
       hp2=line(c(ok),z(ok),'Parent',ax2,'Color','b');
       hold on
       
-
+      
       hp3=plot(d(ok),z(ok),'or')
       hold on
       % error bars
@@ -559,6 +600,8 @@ for icase = 1:length(cases)
       set(hp3,'markerfacecolor',[1 0 0],'markeredgecolor',[1,0,0],'Parent',ax2)
       set(hp2,'Color','none')
       set(gca,'YLim',ax1_YLim);
+      if(fixx), set(gca,'XLim',[0 0.4]); end
+
       set(gca,'XColor',[1 0 0 ])
       set(gca,'fontsize',11)
       Yax=get(gca,'Yaxis')
@@ -577,3 +620,4 @@ for icase = 1:length(cases)
    pfn = sprintf('./%s/p%d.png',plotdir,fix(ydayc*100))
    print(pfn,'-dpng')
 end
+fclose(fid);
