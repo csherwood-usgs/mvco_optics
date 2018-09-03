@@ -238,6 +238,7 @@ for icase = 1:length(cases)
       set(gca,'Xtick',[.1, 1, 10])
       ylabel('Elevation [m]','fontsize',14)
       set(gca,'fontsize',11)
+      text(0.05, 0.97,'a','units','normalized','fontsize',14)
       ts = sprintf('%s\nN=%d\nCa=%7.2f\np=% 5.2f\nr^2=%06.4f\nCa_n=%7.2f\np_n=% 5.2f\nr_n^2=%06.4f',...
          datestr(t,'dd-mmm-yyyy HHMM'),pf.N,pf.Ca,-pf.p,pf.r2,pfnl.Ca,-pfnl.p,pfnl.r2)
       
@@ -269,7 +270,7 @@ for icase = 1:length(cases)
       set(gca,'YLim',ax1_YLim);
       set(gca,'XColor',[1 0 0 ])
       %if(fixx), set(gca,'XLim',[0 0.7]); end
-       set(gca,'Xscale','log')
+      set(gca,'Xscale','log')
       set(gca,'XLim',[.01, 1])
       Yax=get(gca,'Yaxis')
       set(Yax,'Visible','off')
@@ -328,7 +329,8 @@ for icase = 1:length(cases)
       end
       set(gca,'YLim',[.1 2])
       if(fixx), set(gca,'XLim',[0 0.6]); end
-
+      text(0.05, 0.97,'b','units','normalized','fontsize',14)
+      
       set(gca,'XColor',[0 0 1])
       set(gca,'fontsize',11)
       set(gca,'Yticklabel',[])
@@ -417,7 +419,8 @@ for icase = 1:length(cases)
       set(gca,'XColor',[0 0 1])
       set(gca,'YTickLabel',[])
       if(fixx), set(gca,'XLim',[0 30]); end
-
+      text(0.05, 0.97,'c','units','normalized','fontsize',14)
+      
       set(gca,'fontsize',11)
       
       %ylabel('Elevation [m]')
@@ -449,7 +452,7 @@ for icase = 1:length(cases)
       set(hp2,'Color','none')
       set(gca,'YLim',ax1_YLim);
       if(fixx), set(gca,'XLim',[0 250.]); end
-
+      
       set(gca,'XColor',[1 0 0 ])
       set(gca,'fontsize',11)
       Yax=get(gca,'Yaxis')
@@ -491,10 +494,12 @@ for icase = 1:length(cases)
             plot([max(0,c(ik)-sdc(ik)), c(ik)+sdc(ik)],[z(ik) z(ik)],'+k')
          end
          ylabel('Elevation [m]','fontsize',14)
+         text(0.05, 0.97,'d','units','normalized','fontsize',14)
+         
          xlabel('{\itb_{bp(650)}/b_{p(650)}} [ ]','fontsize',14);
          ylim([0.1 2])
          if(fixx), set(gca,'XLim',[0 0.05]); end
-
+         
          set(gca,'fontsize',11)
       end
    end
@@ -528,7 +533,8 @@ for icase = 1:length(cases)
          set(hp,'markerfacecolor','k','markeredgecolor','k')
          xlabel('{\itChl/c_{p(650)}} [mg m^{-2}]','fontsize',14);
          if(fixx), set(gca,'XLim',[0 5.5]); end
-
+         text(0.05, 0.97,'e','units','normalized','fontsize',14)
+         
          ylim([0.1 2])
          set(gca,'fontsize',11)
          set(gca,'Yticklabel',[])
@@ -574,7 +580,8 @@ for icase = 1:length(cases)
       set(gca,'XColor',[0 0 1])
       set(gca,'Yticklabels',[])
       if(fixx), set(gca,'XLim',[0 0.4]); end
-
+      text(0.05, 0.97,'f','units','normalized','fontsize',14)
+      
       set(gca,'fontsize',11)
       hx=xlabel('{\color{blue}{\itV_f / V_m}} and {\color{red}{\itV_f / V_M}} [ ]',...
          'fontsize',14);
@@ -609,7 +616,7 @@ for icase = 1:length(cases)
       set(hp2,'Color','none')
       set(gca,'YLim',ax1_YLim);
       if(fixx), set(gca,'XLim',[0 0.4]); end
-
+      
       set(gca,'XColor',[1 0 0 ])
       set(gca,'fontsize',11)
       Yax=get(gca,'Yaxis')
