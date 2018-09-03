@@ -149,26 +149,31 @@ for icase = 1:length(cases)
    ius = us_tindex;
    i = ba_tindex;
    disp(sum(i))
+
    
-   % info box
-   figure(1); clf
+
    sp_t=nanmean(abs(speed(ius)));
    us_t=nanmean(us(ius));
    uswc_t=nanmean(us_wc(ius));
    ubr_t=nanmean(ubr(ius));
    zo_t=nanmean(zoa(ius));
    J=nanmean(ti(i));
-   
-   text(0.1,.9,datestr((J)))
    ydayc = nanmean(tiyd(i));
-   text(0.1,.8,sprintf('Days: %6.2f - %6.2f',min(tiyd(i)),max(tiyd(i))))
-   text(0.1,.7,sprintf('Speed: %5.2f m/s',sp_t))
-   text(0.1,.6,sprintf('u*wc: % 4.3f m/s',uswc_t))
-   text(0.1,.5,sprintf('u*c: % 4.3f m/s',us_t))
-   text(0.1,.4,sprintf('zo : % 6.4f m',zo_t))
-   set(gca,'Visible','off')
-   %pause
-   fprintf(fid,'%5d, %6.2f, %6.2f, %5.2f, %5.3f, %5.3f, %6.4f\n',fix(100*ydayc),min(tiyd(i)),max(tiyd(i)),...
+
+   % info box - not using anymore
+% % %    figure(1); clf% % %    
+% % %    text(0.1,.9,datestr((J)))
+% % %    text(0.1,.8,sprintf('Days: %6.2f - %6.2f',min(tiyd(i)),max(tiyd(i))))
+% % %    text(0.1,.7,sprintf('Speed: %5.2f m/s',sp_t))
+% % %    text(0.1,.6,sprintf('u*wc: % 4.3f m/s',uswc_t))
+% % %    text(0.1,.5,sprintf('u*c: % 4.3f m/s',us_t))
+% % %    text(0.1,.4,sprintf('zo : % 6.4f m',zo_t))
+% % %    set(gca,'Visible','off')
+% % %    %pause
+% % %    
+
+   fprintf(fid,'%s %5d %6.2f - %6.2f\nspd: %5.2f\nu*wc: %5.3f\nu*c: %5.3f\nzo: %6.4f\n',...
+      cases(icase).name,fix(100*ydayc),min(tiyd(i)),max(tiyd(i)),...
       sp_t,uswc_t,us_t,zo_t);
    
    figure(2); clf
@@ -218,8 +223,7 @@ for icase = 1:length(cases)
       % normalize the nl fit by the linear Ca
       Cest_nl = pfnl.Ca*(zest./za).^pfnl.p; % cp
       Cest_nl2 = pfnl2.Ca*(zest2./za).^pfnl2.p; % bs
-      
-      
+            
       % plot cp in blue
       subplot(2,3,1)
       plot(Cest_nl,zest,'--b','linewidth',2);
@@ -281,11 +285,11 @@ for icase = 1:length(cases)
       ttext1 = sprintf('ws_{cp}=%4.2f ws_{bbp}=%4.2f',-1000*0.41*pfnl.p*us_t,-1000*0.41*pfnl2.p*us_t)
       ht=title(ttext1);
    end
-   
-   nanmean(c)
-   nanstd(c)
-   nanmean(d/40)
-   nanstd(d/40)
+   fprintf(fid,'ws_{cp}=%4.2f, r2=%f; ws_{bbp}=%4.2f, r2=%f\n',...
+      -1000*0.41*pfnl.p*us_t,pfnl.r2,-1000*0.41*pfnl2.p*us_t,pfnl2.r2)
+
+   fprintf(fid,'cp650  : %.2f ( %.3f )\n',nanmean(c(ok)),nanstd(c(ok)))
+   fprintf(fid,'bbp6050: %.2f ( %.3f )\n',nanmean(d(ok)),nanstd(d(ok)))
    
    
    %% UME gamma
@@ -379,6 +383,8 @@ for icase = 1:length(cases)
       
       
    end
+   fprintf(fid,'gamma_cp: %.2f ( %.3f )\n',nanmean(c(ok)),nanstd(c(ok)))
+   fprintf(fid,'gamma_bp: %.2f ( %.3f )\n',nanmean(gamma_bb(ok)),nanstd(gamma_bb(ok)))
    nanmean(c(ok))
    nanstd(c(ok))
    nanmean(gamma_bb(ok))
@@ -460,6 +466,8 @@ for icase = 1:length(cases)
       set(gca,'Position',ax1_pos)
       set(ax1,'Position',ax1_pos)
    end
+   fprintf(fid,'rho_inv: %.2f ( %.3f )\n',nanmean(c(ok)),nanstd(c(ok)))
+   fprintf(fid,'Ds     : %.2f ( %.3f )\n',nanmean(d(ok)),nanstd(d(ok)))
    nanmean(c(ok))
    nanstd(c(ok))
    nanmean(d(ok))
@@ -503,9 +511,7 @@ for icase = 1:length(cases)
          set(gca,'fontsize',11)
       end
    end
-   
-   
-   
+   fprintf(fid,'bs_ratio: %.2f ( %.3f )\n',nanmean(c(ok)),nanstd(c(ok)))
    %% UME chlorophyll over attenuation
    plotnum=5;
    for ino=[8]
@@ -540,7 +546,8 @@ for icase = 1:length(cases)
          set(gca,'Yticklabel',[])
       end
    end
-   
+   fprintf(fid,'Chl/cp: %.2f ( %.3f )\n',nanmean(c(ok)),nanstd(c(ok)))
+
    nanmean(c(ok))
    nanstd(c(ok))
    
@@ -623,7 +630,9 @@ for icase = 1:length(cases)
       set(Yax,'Visible','off')
       set(gca,'Position',ax1_pos)
       set(ax1,'Position',ax1_pos)
-      
+      fprintf(fid,'f/micro: %.2f ( %.3f )\n',nanmean(c(ok)),nanstd(c(ok)))
+      fprintf(fid,'f/Macro: %.2f ( %.3f )\n',nanmean(d(ok)),nanstd(d(ok)))
+
       nanmean(c(ok))
       nanstd(c(ok))
       nanmean(d(ok)/3)
