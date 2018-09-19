@@ -189,8 +189,10 @@ for icase = 1:length(cases)
    allz=ba.(inst{ino,2});
    allc=ba.(inst{ino,3});
    alld=ba.UMEbs650;
+   alle = ba.(inst{5,3}); % LISST attenuation
    allvc=vv.(inst{ino,3});
    allvd=vv.UMEbs650;
+   allve=vv.(inst{5,3});
    
    % cp 650 attenuation
    c = nanmean(allc(:,i)')';
@@ -201,6 +203,12 @@ for icase = 1:length(cases)
    vard =nanvar(allvd(:,i)')';
    sdd = nanstd(alld(:,i)')';
    
+   % LISST attenuation
+   e = nanmean(alle(:,i)')';
+   vare = nanvar(allve(:,i)')';
+   sde = nanstd(alle(:,i)')';  
+   
+   % Depth
    z = nanmean(allz(:,i)')';
    t = nanmean(allt(:,i)')';
    fprintf(1,'Mean profile time: %s\n',datestr(t));
@@ -217,23 +225,37 @@ for icase = 1:length(cases)
       zest = logspace( log10(pf.za),log10(max(z(ok))), 20);
       pf2 = pfit( d(ok), z(ok),0, za);
       zest2 = logspace( log10(pf2.za),log10(max(z(ok))), 20);
+      pf3 = pfit( e(ok), z(ok),0, za);
+      zest3 = logspace( log10(pf3.za),log10(max(z(ok))), 20);
       
       pfnl = pfit_nlp( c(ok), z(ok), varc(ok),0, za);
       pfnl2 = pfit_nlp( d(ok), z(ok), vard(ok),0, za);
+      pfnl3 = pfit_nlp( e(ok), z(ok), vare(ok),0, za);
+
       % normalize the nl fit by the linear Ca
       Cest_nl = pfnl.Ca*(zest./za).^pfnl.p; % cp
       Cest_nl2 = pfnl2.Ca*(zest2./za).^pfnl2.p; % bs
+      Cest_nl3 = pfnl3.Ca*(zest3./za).^pfnl3.p; % LISST
             
       % plot cp in blue
+      % plot LISST in purple
+      ecol = [0 0 0]
       subplot(2,3,1)
-      plot(Cest_nl,zest,'--b','linewidth',2);
+      plot(Cest_nl3,zest3,'--','color',ecol,'linewidth',2);
       hold on
+      plot(Cest_nl,zest,'--b','linewidth',2);
       % error bars
       for ik = 1:length(ok)
          plot([max(0,c(ik)-sdc(ik)), c(ik)+sdc(ik)],[z(ik) z(ik)],'+b')
       end
+      % error bars
+      for ik = 1:length(ok)
+         plot([max(0,e(ik)-sde(ik)), e(ik)+sde(ik)],[z(ik) z(ik)],'color',ecol)
+      end
       hp=plot(c(ok),z(ok),'ob');
       set(hp,'MarkerFaceColor',[0 0 1])
+      hpe=plot(e(ok),z(ok),'ob');
+      set(hpe,'MarkerFaceColor',ecol,'MarkerEdgeColor',ecol)
       set(gca,'YLim',[.1 2])
       set(gca,'XColor',[0 0 1])
       % if(fixx), set(gca,'XLim',[0 40]); end
@@ -246,7 +268,7 @@ for icase = 1:length(cases)
       ts = sprintf('%s\nN=%d\nCa=%7.2f\np=% 5.2f\nr^2=%06.4f\nCa_n=%7.2f\np_n=% 5.2f\nr_n^2=%06.4f',...
          datestr(t,'dd-mmm-yyyy HHMM'),pf.N,pf.Ca,-pf.p,pf.r2,pfnl.Ca,-pfnl.p,pfnl.r2)
       
-      hx=xlabel('{\color{blue}{\itc_{p(650)}}} and {\color{red}{\itb_{bp(650)}}} [m^{-1}]',...
+      hx=xlabel('{\color{red}{\itb_{bp}(650)}}, {\color{blue}{\itc_{p}(650)}}, and {\itc}_{{\itp} LISST} [m^{-1}]',...
          'fontsize',14);
       set(hx,'Color','k')
       
@@ -282,11 +304,12 @@ for icase = 1:length(cases)
       set(ax1,'Position',ax1_pos)
       set(gca,'fontsize',11)
       
-      ttext1 = sprintf('ws_{cp}=%4.2f ws_{bbp}=%4.2f',-1000*0.41*pfnl.p*us_t,-1000*0.41*pfnl2.p*us_t)
+      ttext1 = sprintf('ws_{bbp}=%4.2f, ws_{cp}=%4.2f, ws_{LISST}=%4.2f',...
+         -1000*0.41*pfnl2.p*us_t, -1000*0.41*pfnl.p*us_t,-1000*0.41*pfnl3.p*us_t)
       ht=title(ttext1);
    end
-   fprintf(fid,'ws_{cp}=%4.2f, r2=%f; ws_{bbp}=%4.2f, r2=%f\n',...
-      -1000*0.41*pfnl.p*us_t,pfnl.r2,-1000*0.41*pfnl2.p*us_t,pfnl2.r2)
+   fprintf(fid,'ws_{cp}=%4.2f, r2=%f; ws_{bbp}=%4.2f, r2=%f, ws_{LISST}=%4.2f, r2=%f\n',...
+      -1000*0.41*pfnl.p*us_t,pfnl.r2,-1000*0.41*pfnl2.p*us_t,pfnl2.r2,-1000*0.41*pfnl3.p*us_t,pfnl3.r2)
 
    fprintf(fid,'cp650  : %.2f ( %.3f )\n',nanmean(c(ok)),nanstd(c(ok)))
    fprintf(fid,'bbp6050: %.2f ( %.3f )\n',nanmean(d(ok)),nanstd(d(ok)))
