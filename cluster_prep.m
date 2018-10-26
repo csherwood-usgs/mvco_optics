@@ -58,7 +58,7 @@ c1 = allc(3:9,1:2031);
 allt=ba.LISSTtc;
 allz=ba.LISSTzc;
 allc=ba.LISSTD50v;
-t2 = allt(3:9,1:2031);
+t2 = allt(3:9,1:2031); 
 z2 = allz(3:9,1:2031);
 c2 = allc(3:9,1:2031);
 % abss
@@ -73,13 +73,26 @@ good_columns = find(~isnan(sum([t1;t2;t3;z1;z2;z3;c1;c2;c3])));
 c1 = c1(:,good_columns);
 c2 = c2(:,good_columns);
 c3 = c3(:,good_columns);
-
+% calculate mean depths and mean times
 t = mean([t1(:,good_columns);t2(:,good_columns);t3(:,good_columns)],1);
 z = mean([z1(:,good_columns),z2(:,good_columns),z3(:,good_columns)],2);
+tstd = std([t1(:,good_columns);t2(:,good_columns);t3(:,good_columns)],0,1);
+zstd = std([z1(:,good_columns),z2(:,good_columns),z3(:,good_columns)],0,2);
 size(c1)
 size(c2)
 size(c3)
 size(z)
 size(t)
-pcolorjw(t,z,c3)
-% 
+% standardize each array
+c1mean = mean(c1(:));
+c2mean = mean(c2(:));
+c3mean = mean(c3(:));
+c1std = std(c1(:));
+c2std = std(c2(:));
+c3std = std(c3(:));
+
+c1s = (c1-c1mean)/c1std;
+c2s = (c2-c1mean)/c2std;
+c3s = (c3-c1mean)/c3std;
+
+save profiles.mat t tstd z zstd c1mean c1std c2mean c2std c3mean c3std c1s c2s c3s
