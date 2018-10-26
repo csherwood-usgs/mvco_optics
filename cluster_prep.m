@@ -92,7 +92,40 @@ c2std = std(c2(:));
 c3std = std(c3(:));
 
 c1s = (c1-c1mean)/c1std;
-c2s = (c2-c1mean)/c2std;
-c3s = (c3-c1mean)/c3std;
+c2s = (c2-c2mean)/c2std;
+c3s = (c3-c3mean)/c3std;
 
 save profiles.mat t tstd z zstd c1mean c1std c2mean c2std c3mean c3std c1s c2s c3s
+
+% interpolate 
+uwi = interp1(dus,us_wave,t);
+usi = interp1(dus,ewus,t);
+
+
+c123s = [c1s;c2s;c3s]';
+
+nk = 5
+idx = kmeans(c123s,nk);
+%%
+figure(1); clf
+ip=1
+for k=1:nk
+   subplot(nk,3,ip)
+      plot( mean(c1(:,find(idx==k)),2),z, '-')
+      hold on
+      xlim([.7 3.5])
+   subplot(nk,3,ip+1)
+      plot( mean(c2(:,find(idx==k)),2),z, '-')
+      hold on
+      xlim([145 320])
+
+   subplot(nk,3,ip+2)
+      plot( 1000*mean(c3(:,find(idx==k)),2),z, '-')
+      xlim([.5 5])
+   ip=ip+3
+end
+%%
+figure(2)
+scatter(t,uwi,12,idx)
+figure(3)
+scatter(usi,uwi,12,idx)
