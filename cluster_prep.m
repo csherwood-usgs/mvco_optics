@@ -43,9 +43,12 @@ inst = {...
    'absstc','absszc','abss3','4 MHz ABSS';...
    'UMEtc','UMEzc','UMEgamma','gamma';...
    };
-% a few of these are negative. Not sure why.
+% A few of these are negative. Not sure why. This generates log error 
+% in the gamma calc. 
 ineg = ba.UMEbs650 <0.;
 ba.UMEbs650(ineg)=1e-8;
+ineg = ba.UMEbs532 <0.;
+ba.UMEbs532(ineg)=1e-8;
 %% UMEattn650 profiles
 allt=ba.UMEtc;
 allz=ba.UMEzc;
@@ -77,7 +80,17 @@ t3 = allt(3:9,1:2031);
 z3 = allz(3:9,1:2031);
 c3 = allc(3:9,1:2031);
 
-good_columns = find(~isnan(sum([t1;t2;t3;z1;z2;z3;c1;c2;c3;c4;c5;c6])));
+% temperature
+allt=ba.YSIdn;
+allz=ba.YSIz;
+alls=ba.YSIsal;
+alltemp=ba.YSItemp;
+t4 = allt(3:9,1:2031);
+z4 = allz(3:9,1:2031);
+c8 = alltemp(3:9,1:2031);
+c9 = alls(3:9,1:2031);
+
+good_columns = find(~isnan(sum([t1;t2;t3;t4;z1;z2;z3;z4;c1;c2;c3;c4;c5;c6;c8;c9])));
 c1 = c1(:,good_columns);
 c2 = c2(:,good_columns);
 c3 = c3(:,good_columns);
@@ -85,7 +98,8 @@ c4 = c4(:,good_columns);
 c5 = c5(:,good_columns);
 c6 = c6(:,good_columns);
 c7 =  (650/532)*log(c4./c5); % gammabb
-
+c8 = c8(:,good_columns);
+c9 = c9(:,good_columns);
 
 % calculate mean depths and mean times
 t = mean([t1(:,good_columns);t2(:,good_columns);t3(:,good_columns)],1);
@@ -106,6 +120,8 @@ c4mean = mean(c4(:));
 c5mean = mean(c5(:));
 c6mean = mean(c6(:));
 c7mean = mean(c7(:));
+c8mean = mean(c8(:));
+c9mean = mean(c9(:));
 
 c1std = std(c1(:));
 c2std = std(c2(:));
@@ -114,7 +130,8 @@ c4std = std(c4(:));
 c5std = std(c5(:));
 c6std = std(c6(:));
 c7std = std(c7(:));
-
+c8std = std(c8(:));
+c9std = std(c9(:));
 
 c1s = (c1-c1mean)/c1std;
 c2s = (c2-c2mean)/c2std;
@@ -123,13 +140,13 @@ c4s = (c4-c4mean)/c4std;
 c5s = (c5-c5mean)/c5std;
 c6s = (c6-c6mean)/c6std;
 c7s = (c7-c7mean)/c7std;
+c8s = (c8-c8mean)/c8std;
+c9s = (c9-c9mean)/c9std;
+% save profiles.mat t tstd z zstd c1mean c1std c2mean c2std c3mean c3std c1s c2s c3s
 
-save profiles.mat t tstd z zstd c1mean c1std c2mean c2std c3mean c3std c1s c2s c3s
-
-% interpolate
+% interpolate forcing for profile times
 uwi = interp1(dus,us_wave,t);
 usi = interp1(dus,ewus,t);
-
 %% cp605, d50, abss
 c123s = [c1s;c2s;c3s]';
 nk = 5
@@ -184,7 +201,7 @@ ylabel('u*cw (m/s)')
 print -dpng -r300 optics_acoustics_time_series.png
 
 
-%% all optics
+%% several optics
 c12456s = [c1s;c2s;c4s;c5s;c6s]';
 nk = 5
 clr = linspecer(nk);
@@ -250,7 +267,6 @@ for k=1:nk
 end
 print -dpng -r300 optics_classes.png
 
-
 figure(4)
 for k=1:nk
    h=scatter(t(find(idx==k)),uwi(find(idx==k)),12,'filled');
@@ -261,3 +277,93 @@ datetick('x','keeplimits')
 xlabel('2011')
 ylabel('u*cw (m/s)')
 print -dpng -r300 optics_time_series.png
+
+%%  classify forcing
+% standardize. Keep time as a variable. It would be nice to add temperature
+% and maybe separate speed, ubr, T
+t_mean = mean(t)
+t_std = std(t)
+uwi_mean = mean(uwi)
+uwi_std = std(uwi)
+usi_mean = mean(usi)
+usi_std = std(usi)
+ts = (t-t_mean)/t_std;
+uwis = (uwi-uwi_mean)/uwi_std;
+usis = (usi-usi_mean)/usi_std;
+
+forcing = [uwis; usis; c8s; c9s]';
+
+nk = 5
+clr = linspecer(nk);
+
+idx = kmeans(forcing,nk);
+%
+figure(5); clf
+ip=1
+for k=1:nk
+   
+   subplot(nk,5,ip)
+   plot( mean(c1(:,find(idx==k)),2),z, '-','linewidth',3,'color',clr(k,:))
+   hold on
+   plot( mean(c1(:,find(idx==k)),2)+std(c1(:,find(idx==k)),0,2),...
+      z, '--','linewidth',2,'color',clr(k,:))
+   plot( mean(c1(:,find(idx==k)),2)-std(c1(:,find(idx==k)),0,2),...
+      z, '--','linewidth',2,'color',clr(k,:))
+   xlim([0 11])
+   if(k==1),title('cp650'),end
+   
+   subplot(nk,5,ip+1)
+   plot( mean(c2(:,find(idx==k)),2),z, '-','linewidth',3,'color',clr(k,:))
+   hold on
+   plot( mean(c2(:,find(idx==k)),2)+std(c2(:,find(idx==k)),0,2),...
+      z, '--','linewidth',2,'color',clr(k,:))
+   plot( mean(c2(:,find(idx==k)),2)-std(c2(:,find(idx==k)),0,2),...
+      z, '--','linewidth',2,'color',clr(k,:))
+   xlim([100 350])
+   if(k==1),title('LISST d50'),end
+   
+   subplot(nk,5,ip+2)
+   plot( mean(c4(:,find(idx==k)),2),z, '-','linewidth',3,'color',clr(k,:))
+   hold on
+   plot( mean(c4(:,find(idx==k)),2)+std(c4(:,find(idx==k)),0,2),...
+      z, '--','linewidth',2,'color',clr(k,:))
+   plot( mean(c4(:,find(idx==k)),2)-std(c4(:,find(idx==k)),0,2),...
+      z, '--','linewidth',2,'color',clr(k,:))
+   xlim([0 .3])
+   if(k==1),title('bs 532'),end
+   
+   subplot(nk,5,ip+3)
+   plot( mean(c5(:,find(idx==k)),2),z, '-','linewidth',3,'color',clr(k,:))
+   hold on
+   plot( mean(c5(:,find(idx==k)),2)+std(c5(:,find(idx==k)),0,2),...
+      z, '--','linewidth',2,'color',clr(k,:))
+   plot( mean(c5(:,find(idx==k)),2)-std(c5(:,find(idx==k)),0,2),...
+      z, '--','linewidth',2,'color',clr(k,:))
+   xlim([0 .3])
+   if(k==1),title('bs 650'),end
+   
+      subplot(nk,5,ip+4)
+   plot( mean(c6(:,find(idx==k)),2),z, '-','linewidth',3,'color',clr(k,:))
+   hold on
+   plot( mean(c6(:,find(idx==k)),2)+std(c6(:,find(idx==k)),0,2),...
+      z, '--','linewidth',2,'color',clr(k,:))
+   plot( mean(c6(:,find(idx==k)),2)-std(c6(:,find(idx==k)),0,2),...
+      z, '--','linewidth',2,'color',clr(k,:))
+   xlim([0 20])
+   if(k==1),title('chl'),end
+   
+   ip=ip+5;
+
+end
+print -dpng -r300 forcing_classes.png
+
+figure(6)
+for k=1:nk
+   h=scatter(t(find(idx==k)),uwi(find(idx==k)),12,'filled');
+   set(h,'markerfacecolor',clr(k,:),'markeredgecolor',clr(k,:))
+   hold on
+end
+datetick('x','keeplimits')
+xlabel('2011')
+ylabel('u*cw (m/s)')
+print -dpng -r300 forcing_time_series.png
