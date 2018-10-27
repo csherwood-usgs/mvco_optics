@@ -65,7 +65,7 @@ c6= allf(3:9,1:2031); % Chl
 allt=ba.LISSTtc;
 allz=ba.LISSTzc;
 allc=ba.LISSTD50v;
-t2 = allt(3:9,1:2031); 
+t2 = allt(3:9,1:2031);
 z2 = allz(3:9,1:2031);
 c2 = allc(3:9,1:2031);
 
@@ -126,76 +126,138 @@ c7s = (c7-c7mean)/c7std;
 
 save profiles.mat t tstd z zstd c1mean c1std c2mean c2std c3mean c3std c1s c2s c3s
 
-% interpolate 
+% interpolate
 uwi = interp1(dus,us_wave,t);
 usi = interp1(dus,ewus,t);
 
 %% cp605, d50, abss
 c123s = [c1s;c2s;c3s]';
 nk = 5
+clr = linspecer(nk);
 idx = kmeans(c123s,nk);
 figure(1); clf
 ip=1
 for k=1:nk
    subplot(nk,3,ip)
-      plot( mean(c1(:,find(idx==k)),2),z, '-')
-      hold on
-      xlim([.7 3.5])
+   plot( mean(c1(:,find(idx==k)),2),z, '-','linewidth',3,'color',clr(k,:))
+   hold on
+   plot( mean(c1(:,find(idx==k)),2)+std(c1(:,find(idx==k)),0,2),...
+      z, '--','linewidth',2,'color',clr(k,:))
+   plot( mean(c1(:,find(idx==k)),2)-std(c1(:,find(idx==k)),0,2),...
+      z, '--','linewidth',2,'color',clr(k,:))
+   xlim([0 11])
+   if(k==1),title('cp650'),end
+   
    subplot(nk,3,ip+1)
-      plot( mean(c2(:,find(idx==k)),2),z, '-')
-      hold on
-      xlim([145 320])
+   plot( mean(c2(:,find(idx==k)),2),z, '-','linewidth',3,'color',clr(k,:))
+   hold on
+   plot( mean(c2(:,find(idx==k)),2)+std(c2(:,find(idx==k)),0,2),...
+      z, '--','linewidth',2,'color',clr(k,:))
+   plot( mean(c2(:,find(idx==k)),2)-std(c2(:,find(idx==k)),0,2),...
+      z, '--','linewidth',2,'color',clr(k,:))
+   xlim([100 350])
+   if(k==1),title('LISST d50'),end
+   
    subplot(nk,3,ip+2)
-      plot( 1000*mean(c3(:,find(idx==k)),2),z, '-')
-      xlim([.5 5])
-   ip=ip+3
+   if(k==1),title('abss 2.5'),end
+   plot( 1000*mean(c3(:,find(idx==k)),2),z, '-','linewidth',3,'color',clr(k,:))
+   hold on
+   plot( 1000*mean(c3(:,find(idx==k)),2)+1000*std(c3(:,find(idx==k)),0,2),...
+      z, '--','linewidth',2,'color',clr(k,:))
+   plot( 1000*mean(c3(:,find(idx==k)),2)-1000*std(c3(:,find(idx==k)),0,2),...
+      z, '--','linewidth',2,'color',clr(k,:))
+   xlim([0 5])
+   if(k==1),title('abss 2.5'),end
+   ip=ip+3;
 end
+print -dpng -r300 optics_acoustics_classes.png
 %
 figure(2)
-scatter(t,uwi,12,idx)
-%
-figure(3)
-scatter(usi,uwi,12,idx)
+for k=1:nk
+   h=scatter(t(find(idx==k)),uwi(find(idx==k)),12,'filled');
+   set(h,'markerfacecolor',clr(k,:),'markeredgecolor',clr(k,:))
+   hold on
+end
+datetick('x','keeplimits')
+xlabel('2011')
+ylabel('u*cw (m/s)')
+print -dpng -r300 optics_acoustics_time_series.png
+
+
 %% all optics
 c12456s = [c1s;c2s;c4s;c5s;c6s]';
-nk = 6
+nk = 5
+clr = linspecer(nk);
+
 idx = kmeans(c12456s,nk);
 %
-figure(1); clf
+figure(3); clf
 ip=1
 for k=1:nk
+   
    subplot(nk,5,ip)
-      plot( mean(c1(:,find(idx==k)),2),z, '-')
-      hold on
-      xlim([0 12])
-      if(k==1),title('cp650'),end
+   plot( mean(c1(:,find(idx==k)),2),z, '-','linewidth',3,'color',clr(k,:))
+   hold on
+   plot( mean(c1(:,find(idx==k)),2)+std(c1(:,find(idx==k)),0,2),...
+      z, '--','linewidth',2,'color',clr(k,:))
+   plot( mean(c1(:,find(idx==k)),2)-std(c1(:,find(idx==k)),0,2),...
+      z, '--','linewidth',2,'color',clr(k,:))
+   xlim([0 11])
+   if(k==1),title('cp650'),end
+   
    subplot(nk,5,ip+1)
-      plot( mean(c2(:,find(idx==k)),2),z, '-')
-      hold on
-      xlim([145 320])
-      if(k==1),title('LISST d50'),end
+   plot( mean(c2(:,find(idx==k)),2),z, '-','linewidth',3,'color',clr(k,:))
+   hold on
+   plot( mean(c2(:,find(idx==k)),2)+std(c2(:,find(idx==k)),0,2),...
+      z, '--','linewidth',2,'color',clr(k,:))
+   plot( mean(c2(:,find(idx==k)),2)-std(c2(:,find(idx==k)),0,2),...
+      z, '--','linewidth',2,'color',clr(k,:))
+   xlim([100 350])
+   if(k==1),title('LISST d50'),end
+   
    subplot(nk,5,ip+2)
-      plot( mean(c4(:,find(idx==k)),2),z, '-')
-      xlim([0 .3])
-      if(k==1),title('bs 532'),end
+   plot( mean(c4(:,find(idx==k)),2),z, '-','linewidth',3,'color',clr(k,:))
+   hold on
+   plot( mean(c4(:,find(idx==k)),2)+std(c4(:,find(idx==k)),0,2),...
+      z, '--','linewidth',2,'color',clr(k,:))
+   plot( mean(c4(:,find(idx==k)),2)-std(c4(:,find(idx==k)),0,2),...
+      z, '--','linewidth',2,'color',clr(k,:))
+   xlim([0 .3])
+   if(k==1),title('bs 532'),end
+   
+   subplot(nk,5,ip+3)
+   plot( mean(c5(:,find(idx==k)),2),z, '-','linewidth',3,'color',clr(k,:))
+   hold on
+   plot( mean(c5(:,find(idx==k)),2)+std(c5(:,find(idx==k)),0,2),...
+      z, '--','linewidth',2,'color',clr(k,:))
+   plot( mean(c5(:,find(idx==k)),2)-std(c5(:,find(idx==k)),0,2),...
+      z, '--','linewidth',2,'color',clr(k,:))
+   xlim([0 .3])
+   if(k==1),title('bs 650'),end
+   
+      subplot(nk,5,ip+4)
+   plot( mean(c6(:,find(idx==k)),2),z, '-','linewidth',3,'color',clr(k,:))
+   hold on
+   plot( mean(c6(:,find(idx==k)),2)+std(c6(:,find(idx==k)),0,2),...
+      z, '--','linewidth',2,'color',clr(k,:))
+   plot( mean(c6(:,find(idx==k)),2)-std(c6(:,find(idx==k)),0,2),...
+      z, '--','linewidth',2,'color',clr(k,:))
+   xlim([0 20])
+   if(k==1),title('chl'),end
+   
+   ip=ip+5;
 
-    subplot(nk,5,ip+3)
-      plot( mean(c5(:,find(idx==k)),2),z, '-')
-      hold on
-      xlim([0 .3])
-            if(k==1),title('bs 650'),end
-
-   subplot(nk,5,ip+4)
-      plot( mean(c6(:,find(idx==k)),2),z, '-')
-      hold on
-      xlim([0 20])
-            if(k==1),title('chl'),end
-
-   ip=ip+5
 end
-%
-figure(2)
-scatter(t,uwi,12,idx)
-%
-figure(3)
-scatter(usi,uwi,12,idx)
+print -dpng -r300 optics_classes.png
+
+
+figure(4)
+for k=1:nk
+   h=scatter(t(find(idx==k)),uwi(find(idx==k)),12,'filled');
+   set(h,'markerfacecolor',clr(k,:),'markeredgecolor',clr(k,:))
+   hold on
+end
+datetick('x','keeplimits')
+xlabel('2011')
+ylabel('u*cw (m/s)')
+print -dpng -r300 optics_time_series.png
