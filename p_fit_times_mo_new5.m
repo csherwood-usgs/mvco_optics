@@ -47,7 +47,7 @@ inst = {...
    'absstc','absszc','abss3','4 MHz ABSS';...
    'UMEtc','UMEzc','UMEgamma','gamma';...
    };
-% a few of these are negative. Not sure why.
+% one of these is negative. Not sure why.
 ineg = ba.UMEbs650 <0.;
 ba.UMEbs650(ineg)=1e-8;
 
@@ -406,7 +406,7 @@ for icase = 1:length(cases)
          plot([c(ik)-sdc(ik), c(ik)+sdc(ik)],[z(ik) z(ik)],'+k')
       end
       set(gca,'YLim',yl)
-      if(fixx), set(gca,'XLim',[0 0.6]); end
+      if(fixx), set(gca,'XLim',[0. 0.6]); end
       text(0.05, 0.97,'c','units','normalized','fontsize',14)
       
       set(gca,'XColor',[0 0 0])
@@ -449,7 +449,7 @@ for icase = 1:length(cases)
       set(gca,'YLim',ax1_YLim);
       set(gca,'XColor',[1 0 0 ])
       set(gca,'fontsize',11)
-      if(fixx), set(gca,'XLim',[0 0.4]); end
+      if(fixx), set(gca,'XLim',[-.24 0.35]); end
       Yax=get(gca,'Yaxis')
       set(Yax,'Visible','off')
       set(gca,'Position',ax1_pos)
