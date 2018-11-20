@@ -288,6 +288,13 @@ for icase = 1:length(cases)
       hx=xlabel('{\color{red}{\itb_{bp}(650)}}; {\color{black}{\itc_{p}(650)}}; and {\color{gray}{\itc}_{{\itp} LISST}} [m^{-1}]',...
          'fontsize',12);
       set(hx,'Color','k')
+      ttext1 = sprintf('ws_{bbp}=%4.2f mm/s\nws_{cp}=%4.2f mm/s\nws_{LISST}=%4.2f mm/s',...
+         -1000*0.41*pfnl2.p*us_t, -1000*0.41*pfnl.p*us_t,-1000*0.41*pfnl3.p*us_t)
+      loc = [.29 .795 .15, .08]
+      ha=annotation('textbox',loc,'String',ttext1,'FitBoxToText','on');
+      set(ha,'backgroundcolor',[1 1 1],'facealpha',.8)
+      
+      % second axis
       pos = get(hx,'Position')
       set(hx,'Position',[pos(1)+100 pos(2) pos(3)])
       
@@ -325,10 +332,10 @@ for icase = 1:length(cases)
       set(hx,'fontsize',12)
       
       
-      ttext1 = sprintf('ws_{bbp}=%4.2f, ws_{cp}=%4.2f, ws_{LISST}=%4.2f',...
-         -1000*0.41*pfnl2.p*us_t, -1000*0.41*pfnl.p*us_t,-1000*0.41*pfnl3.p*us_t)
-      ht=title(ttext1);
-      
+%       ttext1 = sprintf('ws_{bbp}=%4.2f, ws_{cp}=%4.2f, ws_{LISST}=%4.2f',...
+%          -1000*0.41*pfnl2.p*us_t, -1000*0.41*pfnl.p*us_t,-1000*0.41*pfnl3.p*us_t)
+%       ht=title(ttext1);
+
    end
    fprintf(fid,'ws_{cp}=%4.2f, r2=%f; ws_{bbp}=%4.2f, r2=%f, ws_{LISST}=%4.2f, r2=%f\n',...
       -1000*0.41*pfnl.p*us_t,pfnl.r2,-1000*0.41*pfnl2.p*us_t,pfnl2.r2,-1000*0.41*pfnl3.p*us_t,pfnl3.r2)
@@ -504,7 +511,7 @@ for icase = 1:length(cases)
       set(gca,'fontsize',11)
       
       ylabel('Elevation [m]','fontsize',12)
-      hx=xlabel('{\color{black}{\it\rho_a^{-1}} [\mum^3 m^{-1}]}; {\color{red}{\itD_s}[\mum]}',...
+      hx=xlabel('{\color{black}{\it\rho_a^{-1}} [10^{-9} m^{-1}]}; {\color{red}{\itD_s}[\mum]}',...
          'fontsize',12);
       set(hx,'Color','k','fontsize',12)
       
