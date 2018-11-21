@@ -511,7 +511,7 @@ for icase = 1:length(cases)
       set(gca,'fontsize',11)
       
       ylabel('Elevation [m]','fontsize',12)
-      hx=xlabel('{\color{black}{\it\rho_a^{-1}} [10^{-9} m^{-1}]}; {\color{red}{\itD_s}[\mum]}',...
+      hx=xlabel('{\color{black}{\it\rho_a^{-1}} [\mum]}; {\color{red}{\itD_s}[\mum]}',...
          'fontsize',12);
       set(hx,'Color','k','fontsize',12)
       
